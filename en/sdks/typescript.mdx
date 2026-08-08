@@ -118,6 +118,22 @@ await hyze.apps.deployFromZip({
 // await hyze.apps.deployFromZip({ ..., startupCommand: "node server.js" });
 ```
 
+### Replace files and rebuild
+
+Use `redeployFromZip` to publish a new deployment for an existing app. The current deployment stays active until the new one is ready.
+
+```ts
+import { readFileSync } from "node:fs";
+
+await hyze.apps.redeployFromZip("app_001", readFileSync("./app.zip"));
+const rebuild = await hyze.apps.rebuild("app_001");
+await hyze.apps.waitForDeployment("app_001", rebuild.deploymentId);
+const running = await hyze.apps.waitForRunning("app_001");
+console.log(running.status);
+```
+
+Use `hyze.apps.deployments(appId)` to list deployment history. `rebuild` returns immediately with a `deploymentId`; wait for that deployment instead of treating the HTTP response as readiness.
+
 ### Deploy from GitHub
 
 ```ts

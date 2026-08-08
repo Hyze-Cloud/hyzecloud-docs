@@ -209,9 +209,37 @@ Updates app settings. When runtime-affecting fields change, the container is res
 
 ---
 
-## Get Build History
+## Get deployment history
 
-```http GET /api/apps/:appId/builds
+```http
+GET /api/apps/:appId/deployments
 ```
 
-Returns recent deploy build entries.
+Returns recent deployment entries.
+
+## Replace app files from ZIP
+
+```http
+PUT /api/apps/:appId/files
+```
+
+Replaces the app source with a ZIP and starts an immutable production deployment. The current deployment remains active until the new one is ready.
+
+## Rebuild app files
+
+```http
+POST /api/apps/:appId/rebuild
+```
+`rebuild` starts a new deployment and returns a `deploymentId`. Poll `GET /api/apps/:appId/deployments` until that deployment reaches `success` or `failed`.
+
+## Build progress
+
+```http
+GET /api/apps/:appId/build-progress
+```
+
+Returns the current build phase and accumulated logs.
+
+<Tip>
+  A deployment can continue running after a client connection error. Confirm the active app status and build record before reporting failure.
+</Tip>
