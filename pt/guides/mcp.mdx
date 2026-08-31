@@ -1,0 +1,97 @@
+---
+title: MCP (agentes de IA)
+description: Conecte agentes de IA como Claude Code, OpenCode e Codex à Hyze Cloud via MCP para listar apps, ver logs e diagnosticar deploys.
+icon: robot
+---
+
+O MCP (Model Context Protocol) é o padrão aberto que conecta agentes de IA a ferramentas externas. O servidor MCP da Hyze Cloud expõe operações read-only da plataforma para que você possa perguntar ao seu agente, em linguagem natural, coisas como "liste meus apps" ou "por que meu deploy falhou".
+<Tip>
+  O servidor MCP é **somente leitura** no MVP. Ele opera com a sua API key e passa pelas mesmas regras de permissão da API pública — nenhum recurso extra, nenhum acesso direto a bancos ou workers.
+</Tip>
+
+## O que o agente pode fazer
+
+- `apps_list` — listar os apps do seu workspace (com busca e paginação)
+- `apps_get` — detalhes de um app: status, URL pública, repositório, último commit
+- `deployments_list` — histórico de deploys com status e resumo de erro
+- `apps_logs` — logs recentes de runtime (com limite de tamanho)
+- `domains_list` — domínios do app com status de verificação e SSL
+
+<Callout>
+  Operações de escrita (criar app, deploy, restart, excluir) não estão disponíveis no MCP ainda.
+</Callout>
+
+## Requisito: uma API key
+
+O MCP usa a mesma autenticação da API pública. Se você ainda não tem uma key, siga o guia de [chave de API](/pt/guides/api-keys): **Settings → Developer → Create Key** no [Dashboard](http://hyzecloud.com/dashboard).
+
+Guarde a key em um lugar seguro (gerenciador de senhas ou variável de ambiente). Ela fica ligada ao seu workspace e define o que o agente pode ver.
+
+## Configurar no Claude Code
+
+<Steps>
+  <Step>
+    Abra o terminal e execute:
+
+    ```bash
+    claude mcp add --transport http hyze https://mcp.hyzecloud.com/mcp \
+      --header "Authorization: Bearer hyze_sua_chave"
+    ```
+  </Step>
+  <Step>
+    Verifique a conexão:
+
+    ```bash
+    claude mcp list
+    ```
+  </Step>
+</Steps>
+
+<Note>
+  A sintaxe de configuração pode variar entre versões. Se o comando falhar, confira a versão do seu cliente — recomendamos sempre a versão mais recente.
+</Note>
+
+## Configurar em outros clientes
+
+Qualquer cliente MCP com suporte a "Streamable HTTP" funciona com:
+
+- **URL**: `https://mcp.hyzecloud.com/mcp`
+- **Header**: `Authorization: Bearer hyze_sua_chave`
+
+Em clientes que usam JSON de configuração, fica assim:
+
+```json
+{
+  "mcpServers": {
+    "hyze": {
+      "type": "http",
+      "url": "https://mcp.hyzecloud.com/mcp",
+      "headers": {
+        "Authorization": "Bearer hyze_sua_chave"
+      }
+    }
+  }
+}
+```
+
+## Exemplos de uso
+
+Depois de conectar, experimente perguntar ao agente:
+
+- "Liste meus apps da Hyze"
+- "Qual o status do app X e qual a URL pública dele?"
+- "Por que o último deploy do app X falhou?"
+- "Mostre os logs recentes do app X"
+
+## Revogar acesso
+
+Para desconectar um agente, revogue a API key no dashboard (**Settings → Developer**). O agente perde o acesso imediatamente, sem precisar mexer na configuração do cliente.
+
+<Warning>
+  Use uma key dedicada ao agente. Assim você pode revogá-la sem afetar suas outras integrações.
+</Warning>
+
+## Relacionado
+
+- [Autenticação](/pt/getting-started/authentication) — como a API key funciona
+- [Ver logs](/pt/guides/view-logs) — diagnóstico pela API

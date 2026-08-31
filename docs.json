@@ -127,7 +127,8 @@
                   "en/guides/provision-a-database",
                   "en/guides/back-up-a-database",
                   "en/guides/manage-secrets",
-                  "en/guides/view-logs"
+                  "en/guides/view-logs",
+                  "en/guides/mcp"
                 ]
               },
               {
@@ -233,7 +234,8 @@
                   "pt/guides/provision-a-database",
                   "pt/guides/back-up-a-database",
                   "pt/guides/manage-secrets",
-                  "pt/guides/view-logs"
+                  "pt/guides/view-logs",
+                  "pt/guides/mcp"
                 ]
               },
               {
