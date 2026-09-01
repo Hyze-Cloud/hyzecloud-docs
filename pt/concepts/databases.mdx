@@ -1,19 +1,23 @@
 ---
 title: Bancos de dados
-description: Bancos de dados são serviços gerenciados de dados conectados ao seu workspace.
+icon: database
+description: Bancos gerenciados de PostgreSQL, MySQL, MongoDB e Redis conectados ao seu workspace.
 ---
 
-A Hyze Cloud pode provisionar PostgreSQL, MySQL, MongoDB e Redis.
+A Hyze Cloud provisiona e opera bancos gerenciados dentro do seu workspace. Você cria a instância pela API ou pelo dashboard, recebe uma string de conexão e a injeta no seu app como variável de ambiente.
 
-## Objetivo
+## Engines disponíveis
 
-Entender quando criar um banco de dados e como ele se conecta a apps.
+| Engine | Uso típico |
+| --- | --- |
+| PostgreSQL | Dados relacionais, o padrão para a maioria das APIs |
+| MySQL | Dados relacionais com ecossistema MySQL |
+| MongoDB | Dados documentais |
+| Redis | Cache, filas e contadores |
 
-## Quando usar
+## Como os apps se conectam
 
-Crie um banco de dados quando seu app precisar de dados persistentes, filas, cache ou armazenamento documental.
-
-## Exemplo
+Na criação, a Hyze retorna uma `connectionString`. Guarde-a como variável de ambiente do app:
 
 ```json
 {
@@ -24,19 +28,30 @@ Crie um banco de dados quando seu app precisar de dados persistentes, filas, cac
 }
 ```
 
-## Como os apps se conectam
+```bash
+curl -X PUT https://api.hyzecloud.com/api/apps/app_001/env \
+  -H "Authorization: Bearer hyze_sua_chave" \
+  -H "Content-Type: application/json" \
+  -d '{ "envVars": { "DATABASE_URL": "postgresql://user:pass@host:5432/db" } }'
+```
 
-Após a criação, a Hyze Cloud retorna uma string de conexão.
+<Callout type="warning">
+  Trate a string de conexão como segredo. Ela dá acesso total aos dados. Não commite, não cole em logs e rotacione a senha se vazar — `POST /api/databases/:id/rotate-password`.
+</Callout>
 
-Armazene-a como variável de ambiente do app, como `DATABASE_URL`.
+## Operação
+
+A Hyze cuida do ciclo de vida: start, stop, estatísticas, logs, backups e restauração. Tudo disponível pela [API de bancos](/api-reference/databases).
+
+Por padrão, a criação usa `memoryMB: 512` e `storageGB: 5` (mínimo 256 MB e 1 GB).
 
 ## Próximos passos
 
 <CardGroup cols={2}>
   <Card title="Provisionar um banco" icon="database" href="/pt/guides/provision-a-database">
-    Crie um banco e conecte-o a um app.
+    Crie um banco e conecte-o a um app passo a passo.
   </Card>
-  <Card title="API de Bancos" icon="book-open" href="/api-reference/databases">
-    Veja endpoints de bancos de dados.
+  <Card title="Backup de banco" icon="box-archive" href="/pt/guides/back-up-a-database">
+    Proteja dados antes de mudanças arriscadas.
   </Card>
 </CardGroup>

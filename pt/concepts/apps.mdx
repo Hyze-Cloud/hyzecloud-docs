@@ -1,19 +1,20 @@
 ---
 title: Apps
+icon: cube
 description: Apps são serviços implantáveis que executam seu código.
 ---
 
-Um app é a unidade principal que você deploya na Hyze Cloud.
+Um app é a unidade principal que você publica na Hyze Cloud: uma API, worker, dashboard, bot ou serviço em background rodando em um container gerenciado.
 
-## Objetivo
+## O que um app inclui
 
-Entender o que um app contém antes de fazer deploy.
+Cada app carrega:
 
-## Quando usar
-
-Use apps para APIs, workers, dashboards, bots e serviços em background.
-
-## Exemplo
+- Configuração de runtime (`node`, `bun` ou `python`)
+- Variáveis de ambiente
+- Logs e histórico de builds
+- Backups
+- Acesso ao sistema de arquivos
 
 ```json
 {
@@ -24,27 +25,33 @@ Use apps para APIs, workers, dashboards, bots e serviços em background.
 }
 ```
 
-`startupCommand` é opcional. Omita (ou use `"auto"`) e a Hyze detecta como iniciar o app. Passe um comando custom só quando precisar sobrescrever a detecção.
+`startupCommand` é opcional. Omita (ou use `"auto"`) e a Hyze detecta como iniciar o app — Vite, Next, Node, site estático e Python são reconhecidos automaticamente. Passe um comando custom só quando precisar sobrescrever a detecção.
 
-## O que um app inclui
+## Como um app roda
 
-- Configuração de runtime
-- Variáveis de ambiente
-- Logs
-- Acesso ao sistema de arquivos
-- Backups
-- Histórico de builds
+Todo request a um app publicado passa pelo proxy da Hyze antes de chegar no seu container. O proxy resolve o subdomínio, aplica rate limits e encaminha o tráfego para a porta exposta.
+
+```text
+Cliente → proxy Hyze → seu container
+```
+
+Isso significa duas coisas na prática:
+
+- Seu app deve escutar em `0.0.0.0`, não em `localhost`
+- A porta configurada em `exposePort` deve ser a mesma em que seu servidor escuta
+
+## Limites
+
+- Memória configurável por app (`memoryMB`)
+- Rate limits no proxy público: 80 req/s por IP e 400 req/s por host — veja [Rate limits](/pt/concepts/rate-limits)
 
 ## Próximos passos
 
 <CardGroup cols={2}>
   <Card title="Fazer deploy de um app" icon="rocket" href="/pt/guides/deploy-an-app">
-    Deploy a partir de um artefato ZIP.
+    Publique via ZIP ou GitHub.
   </Card>
-  <Card title="Rate limits" icon="gauge-high" href="/pt/concepts/rate-limits">
-    Limites no proxy público e na API.
-  </Card>
-  <Card title="API de Apps" icon="book-open" href="/api-reference/apps">
-    Veja endpoints de apps.
+  <Card title="Referência de Apps" icon="book-open" href="/api-reference/apps">
+    Endpoints de ciclo de vida, logs, env e backups.
   </Card>
 </CardGroup>

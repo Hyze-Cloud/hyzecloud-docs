@@ -1,15 +1,12 @@
 ---
 title: Deploy with curl
-description: Deploy a ZIP artifact using only curl.
+icon: terminal
+description: Deploy a ZIP artifact using only curl — the minimal path for CI.
 ---
 
-This is the smallest deploy path for CI systems that produce a ZIP artifact.
+This is the shortest deploy path for CI systems that produce a ZIP artifact: one `curl`, no SDK.
 
-## Goal
-
-Deploy `app.zip` as a Hyze Cloud app.
-
-## Example
+## Deploy
 
 ```bash
 export HYZE_API_KEY="hyze_your_key"
@@ -23,17 +20,43 @@ curl -X POST https://api.hyzecloud.com/api/apps/deploy \
   -F "exposePort=3000"
 ```
 
-`startupCommand` is optional. Omit it (or pass `auto`) and Hyze detects the right start command. Override only when you need a custom command:
+`startupCommand` is optional. Omit it (or use `auto`) and Hyze detects the right command. Override only if needed:
 
 ```bash
   -F "startupCommand=node server.js"
+```
+
+## In a CI script
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+response=$(curl -sf -X POST https://api.hyzecloud.com/api/apps/deploy \
+  -H "Authorization: Bearer $HYZE_API_KEY" \
+  -F "file=@app.zip" \
+  -F "name=my-api" \
+  -F "runtime=node" \
+  -F "memoryMB=512" \
+  -F "exposePort=3000")
+
+echo "Deploy sent: $response"
+```
+
+`set -euo pipefail` makes the pipeline fail if the deploy fails — no silently broken deploys.
+
+## Verify
+
+```bash
+curl https://api.hyzecloud.com/api/apps/ \
+  -H "Authorization: Bearer $HYZE_API_KEY"
 ```
 
 ## Next steps
 
 <CardGroup cols={2}>
   <Card title="View logs" icon="terminal" href="/en/guides/view-logs">
-    Confirm the app started successfully.
+    Confirm the app started correctly.
   </Card>
   <Card title="Manage secrets" icon="key" href="/en/guides/manage-secrets">
     Add production environment variables.

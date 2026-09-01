@@ -1,24 +1,25 @@
 ---
 title: Ver logs do app
-description: Inspecione a saída recente do app pela API.
+icon: scroll
+description: Inspecione a saída recente do app pela API para depurar falhas e comportamento em runtime.
 ---
 
-Logs ajudam a depurar falhas de inicialização, crashes e comportamento em runtime.
-
-## Objetivo
-
-Obter linhas de log recentes de um app.
+Logs mostram o que seu app imprimiu no stdout/stderr — a primeira coisa a olhar quando um deploy falha, o app reinicia em loop ou algo se comporta diferente do esperado.
 
 ## Quando usar
 
-Use logs após deploys, reinicializações, mudanças de ambiente ou relatos de incidentes.
+Depois de deploys, reinicializações, mudanças de variáveis de ambiente ou relatos de erro.
 
-## Exemplo
+## Buscar logs
 
 ```bash
 curl "https://api.hyzecloud.com/api/apps/app_001/logs?tail=200&timestamps=true" \
   -H "Authorization: Bearer hyze_sua_chave"
 ```
+
+<Callout type="info">
+  Logs são recentes, não um histórico completo. Para auditar deploys anteriores, use o histórico de builds: `GET /api/apps/:appId/builds`.
+</Callout>
 
 ## Opções
 
@@ -26,6 +27,20 @@ curl "https://api.hyzecloud.com/api/apps/app_001/logs?tail=200&timestamps=true" 
 | --- | --- | --- |
 | `tail` | `100` | Número de linhas a retornar. |
 | `timestamps` | `false` | Incluir timestamps na saída. |
+
+## Problemas comuns
+
+<AccordionGroup>
+  <Accordion title="O app retorna erro mas os logs estão vazios">
+    O processo pode não ter iniciado. Verifique o status com `GET /api/apps/:appId` e confira o histórico de builds — a falha pode estar na etapa de build, não no runtime.
+  </Accordion>
+  <Accordion title="Logs não mostram nada após atualizar variáveis de ambiente">
+    Variáveis são injetadas na inicialização. Reinicie o app (`POST /api/apps/:appId/restart`) e busque os logs de novo.
+  </Accordion>
+  <Accordion title="Preciso de mais linhas">
+    Aumente `tail` (ex.: `?tail=1000`). Se o problema sumiu antes de você olhar, adicione timestamps com `&timestamps=true` para alinhar com o incidente.
+  </Accordion>
+</AccordionGroup>
 
 ## Próximos passos
 

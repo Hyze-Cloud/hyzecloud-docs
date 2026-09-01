@@ -1,19 +1,35 @@
 ---
 title: Quickstart
-description: Authenticate and call the Hyze Cloud API in a few minutes.
+icon: bolt
+description: From zero to a working authenticated request in a few minutes.
 ---
 
-Get from zero to a working API request.
+This guide takes you from a fresh dashboard account to a working authenticated request. If it returns your apps, your authentication is correct — and everything built on top of it (CI/CD, scripts, backend) works the same way.
 
-## 1. Create an API key
+## Prerequisites
 
-1. Open [hyzecloud.com/dashboard](http://hyzecloud.com/dashboard)
-2. Go to **Settings → API Keys → Create Key**
-3. Copy the key (`hyze_...`) — it is shown once
+- A Hyze Cloud account ([sign up](http://hyzecloud.com/dashboard))
+- An API key (starts with `hyze_`) — if you don't have one yet, follow the [API keys guide](/en/guides/api-keys)
 
-## 2. Call the API
+<Callout type="info">
+  The API base URL is `https://api.hyzecloud.com/api`. Keep that prefix in every request.
+</Callout>
 
-Base URL: `https://api.hyzecloud.com/api`
+## Create the API key
+
+<Steps>
+  <Step title="Open the dashboard">
+    Go to [hyzecloud.com/dashboard](http://hyzecloud.com/dashboard) and sign in.
+  </Step>
+  <Step title="Navigate to API Keys">
+    Open **Settings → Developer** and click **New key**.
+  </Step>
+  <Step title="Copy the key">
+    It starts with `hyze_`. Copy it — the full key is shown only once.
+  </Step>
+</Steps>
+
+## Make the first request
 
 ```bash
 export HYZE_API_KEY="hyze_your_key"
@@ -22,9 +38,9 @@ curl https://api.hyzecloud.com/api/apps/ \
   -H "Authorization: Bearer $HYZE_API_KEY"
 ```
 
-A JSON list of apps means auth is working.
+A JSON list of your workspace's apps means authentication works.
 
-### With the SDK
+## With the SDK
 
 ```bash
 npm install @hyzecloud/sdk
@@ -38,11 +54,25 @@ const { apps } = await hyze.apps.list();
 console.log(apps);
 ```
 
+## If something goes wrong
+
+<AccordionGroup>
+  <Accordion title="401 Unauthorized">
+    The key wasn't sent, is wrong/revoked, or the header doesn't follow the `Bearer hyze_...` format. Check your `HYZE_API_KEY` value in the shell with `echo $HYZE_API_KEY`.
+  </Accordion>
+  <Accordion title="404 Not Found">
+    You probably dropped the `/api` prefix from the base URL.
+  </Accordion>
+  <Accordion title="429 Too Many Requests">
+    API rate limit. Respect the `Retry-After` header and retry after the indicated seconds.
+  </Accordion>
+</AccordionGroup>
+
 ## Next
 
 <CardGroup cols={2}>
   <Card title="Deploy an app" icon="rocket" href="/en/guides/deploy-an-app">
-    Ship from ZIP or GitHub.
+    Publish from ZIP or GitHub.
   </Card>
   <Card title="Node.js SDK" icon="code" href="/en/sdks/typescript">
     Full SDK guide.
@@ -50,7 +80,7 @@ console.log(apps);
   <Card title="Provision a database" icon="database" href="/en/guides/provision-a-database">
     Create PostgreSQL, MySQL, MongoDB, or Redis.
   </Card>
-  <Card title="API Reference" icon="book-open" href="/api-reference/introduction">
-    Explore all endpoints.
+  <Card title="API reference" icon="book-open" href="/api-reference/introduction">
+    Every endpoint.
   </Card>
 </CardGroup>

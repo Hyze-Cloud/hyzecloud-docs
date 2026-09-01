@@ -2,20 +2,44 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Hyze Cloud API",
-    "description": "Official API documentation",
+    "description": "A REST API da Hyze Cloud. Publique apps Node, Bun e Python, provisione bancos gerenciados e automatize sua infraestrutura. Autenticação por API key Bearer (`hyze_...`).",
     "version": "1.0.0"
   },
+  "tags": [
+    {
+      "name": "Applications",
+      "description": "Deploy, ciclo de vida, logs, variáveis de ambiente, configurações e backups de apps."
+    },
+    {
+      "name": "Databases",
+      "description": "Provisionamento e operação de bancos gerenciados PostgreSQL, MySQL, MongoDB e Redis."
+    },
+    {
+      "name": "API Keys",
+      "description": "Criação e gerenciamento das chaves que autenticam requisições à API."
+    },
+    {
+      "name": "Invoices",
+      "description": "Faturamento do workspace: faturas, pagamento via PIX e status."
+    },
+    {
+      "name": "GitHub Integrations",
+      "description": "Integração GitHub: status, instalação, repositórios, branches e detecção de runtime."
+    }
+  ],
   "components": {
     "securitySchemes": {
       "bearerAuth": {
         "type": "http",
         "scheme": "bearer",
-        "x-default": "hyze_your_api_key"
+        "x-default": "hyze_your_api_key",
+        "description": "API key com prefixo `hyze_`. Crie no dashboard em Settings → Developer."
       },
       "cookieAuth": {
         "type": "apiKey",
         "in": "cookie",
-        "name": "better-auth.session_token"
+        "name": "better-auth.session_token",
+        "description": "Autenticação por sessão do dashboard (browser)."
       }
     },
     "schemas": {}
@@ -40,7 +64,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Lista todas as chaves de API do workspace. O secret completo nunca é retornado — apenas nome, prefixo e metadados."
       },
       "post": {
         "tags": [
@@ -149,7 +174,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Cria uma nova chave de API. O secret completo (`hyze_...`) é retornado apenas nesta resposta — armazene imediatamente."
       }
     },
     "/api/api-keys/{keyId}": {
@@ -250,7 +276,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Atualiza nome ou status de uma chave existente."
       },
       "delete": {
         "tags": [
@@ -281,7 +308,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Revoga a chave imediatamente. Requisições com ela passam a retornar 401."
       }
     },
     "/api/apps/deploy": {
@@ -504,7 +532,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Faz deploy de um app a partir de um arquivo ZIP (multipart). `startupCommand` é opcional — omita ou use `auto` para detecção automática (Vite, Next, Node, estático, Python)."
       }
     },
     "/api/apps/deploy-from-repo": {
@@ -838,7 +867,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Faz deploy a partir de um repositório GitHub conectado. Com `autoDeploy: true`, pushes na branch disparam novos deploys."
       }
     },
     "/api/apps/": {
@@ -870,7 +900,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Lista os apps do workspace. Passe `?workspaceId=` para mirar outro workspace ao usar API key."
       }
     },
     "/api/apps/{appId}": {
@@ -895,7 +926,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Retorna detalhes do app: status, URL pública, runtime, stats e repositório."
       },
       "delete": {
         "tags": [
@@ -918,7 +950,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Exclui o app permanentemente."
       }
     },
     "/api/apps/{appId}/builds": {
@@ -943,7 +976,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Histórico de builds do app com status e resumo de erro de cada deploy."
       }
     },
     "/api/apps/{appId}/start": {
@@ -968,7 +1002,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Inicia o app."
       }
     },
     "/api/apps/{appId}/stop": {
@@ -993,7 +1028,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Para o app."
       }
     },
     "/api/apps/{appId}/restart": {
@@ -1018,7 +1054,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Reinicia o processo do app. Necessário após mudar variáveis de ambiente usadas no boot."
       }
     },
     "/api/apps/{appId}/logs": {
@@ -1073,7 +1110,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Retorna as linhas de log recentes do app (stdout/stderr). Não é histórico completo — para auditoria de deploys, use o histórico de builds."
       }
     },
     "/api/apps/{appId}/env": {
@@ -1098,7 +1136,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Retorna as variáveis de ambiente do app (decifradas)."
       },
       "put": {
         "tags": [
@@ -1174,7 +1213,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Faz merge das variáveis enviadas no ambiente existente. Valores são injetados na inicialização — reinicie o app depois. Chaves reservadas (`NODE_ENV`, `PORT`, prefixos `HYZE_`, `DOCKER_`, `AWS_`) são rejeitadas."
       }
     },
     "/api/apps/{appId}/settings": {
@@ -1312,7 +1352,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Atualiza configurações do app. Mudanças que afetam o runtime reiniciam o container."
       }
     },
     "/api/apps/{appId}/backup": {
@@ -1337,7 +1378,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Cria um backup manual do app."
       }
     },
     "/api/apps/{appId}/backups": {
@@ -1362,7 +1404,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Lista os backups existentes do app."
       },
       "delete": {
         "tags": [
@@ -1385,7 +1428,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Exclui todos os backups do app."
       }
     },
     "/api/apps/{appId}/backups/restore": {
@@ -1457,7 +1501,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Restaura um backup. Substitui os dados atuais do app."
       }
     },
     "/api/apps/{appId}/backups/{backupId}/download": {
@@ -1491,7 +1536,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Baixa o conteúdo de um backup."
       }
     },
     "/api/databases/": {
@@ -1693,7 +1739,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Cria um banco gerenciado (`postgresql`, `mysql`, `mongodb` ou `redis`). A criação é assíncrona — a resposta traz `operationId`. Mínimos: 256 MB de memória e 1 GB de armazenamento. A resposta inclui a `connectionString`: trate como segredo."
       },
       "get": {
         "tags": [
@@ -1705,7 +1752,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Lista os bancos do workspace. Strings de conexão vêm mascaradas."
       }
     },
     "/api/databases/{databaseId}": {
@@ -1730,7 +1778,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Retorna detalhes do banco: engine, status e metadados."
       },
       "delete": {
         "tags": [
@@ -1753,7 +1802,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Exclui o banco permanentemente."
       }
     },
     "/api/databases/{databaseId}/settings": {
@@ -1846,7 +1896,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Atualiza memória e armazenamento do banco."
       }
     },
     "/api/databases/{databaseId}/stats": {
@@ -1871,7 +1922,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Estatísticas de uso do banco."
       }
     },
     "/api/databases/{databaseId}/logs": {
@@ -1926,7 +1978,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Logs recentes do processo do banco."
       }
     },
     "/api/databases/{databaseId}/start": {
@@ -1951,7 +2004,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Inicia o banco."
       }
     },
     "/api/databases/{databaseId}/stop": {
@@ -1976,7 +2030,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Para o banco."
       }
     },
     "/api/databases/{databaseId}/rotate-password": {
@@ -2039,7 +2094,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Rotaciona a senha do banco. Atualize a string de conexão usada pelos apps clientes."
       }
     },
     "/api/databases/{databaseId}/backups": {
@@ -2064,7 +2120,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Cria um backup manual do banco. Recomendado antes de mudanças de schema, imports ou rotação de senha."
       },
       "get": {
         "tags": [
@@ -2087,7 +2144,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Lista os backups existentes do banco."
       }
     },
     "/api/databases/{databaseId}/backups/{backupId}/download": {
@@ -2121,7 +2179,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Baixa o conteúdo de um backup."
       }
     },
     "/api/databases/{databaseId}/restore": {
@@ -2193,7 +2252,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Restaura um backup. Substitui os dados atuais do banco de destino — confirme o `databaseId` antes de executar em produção."
       }
     },
     "/api/databases/{databaseId}/operations": {
@@ -2218,7 +2278,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Lista operações assíncronas do banco (criação, restore) com status atual."
       }
     },
     "/api/integrations/github/status": {
@@ -2232,7 +2293,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Verifica se a integração GitHub está conectada no workspace."
       }
     },
     "/api/integrations/github/install-url": {
@@ -2246,7 +2308,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Gera a URL de instalação do GitHub App."
       }
     },
     "/api/integrations/github/connection": {
@@ -2260,7 +2323,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Desconecta a integração GitHub do workspace."
       }
     },
     "/api/integrations/github/repos": {
@@ -2314,7 +2378,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Lista os repositórios acessíveis pela integração."
       }
     },
     "/api/integrations/github/repos/{owner}/{repo}/branches": {
@@ -2348,7 +2413,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Lista as branches de um repositório conectado."
       }
     },
     "/api/integrations/github/repos/{owner}/{repo}/runtime": {
@@ -2391,7 +2457,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Detecta o runtime provável (node, bun, python) de um repositório."
       }
     },
     "/api/invoices/": {
@@ -2430,7 +2497,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Lista as faturas do workspace."
       }
     },
     "/api/invoices/pix": {
@@ -2526,7 +2594,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Cria uma fatura com pagamento via PIX. Retorna `brCode` e `brCodeBase64` para exibição."
       }
     },
     "/api/invoices/{invoiceId}/status": {
@@ -2574,7 +2643,8 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "description": "Consulta o status de pagamento de uma fatura."
       }
     }
   },

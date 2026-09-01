@@ -1,26 +1,23 @@
 ---
 title: Fazer deploy de um app
+icon: rocket
 description: Envie um app Node.js, Bun ou Python com a API da Hyze Cloud.
 ---
 
-Use a API de Apps quando quiser deploys a partir de CI/CD, ferramentas internas ou seu próprio painel de controle.
+Use a API de Apps quando quiser deploys a partir de CI/CD, ferramentas internas ou seu próprio painel. Dois caminhos: enviar um ZIP pronto ou apontar para um repositório GitHub conectado.
 
-## Escolha uma fonte de deploy
+## Escolha a fonte de deploy
 
-<CardGroup cols={2}>
-  <Card title="Upload ZIP" icon="file-zipper" href="#deploy-from-a-zip">
-    Melhor para artefatos de build gerados por CI.
-  </Card>
-  <Card title="Repositório GitHub" icon="github" href="#deploy-from-github">
-    Melhor quando a Hyze Cloud deve baixar o código de um repositório conectado.
-  </Card>
-</CardGroup>
+| Fonte | Melhor para |
+| --- | --- |
+| [ZIP](#deploy-a-partir-de-um-zip) | Artefatos de build gerados por CI |
+| [GitHub](#deploy-pelo-github) | Código-fonte em repositório conectado, com auto deploy |
 
 ## Deploy a partir de um ZIP
 
 <Steps>
   <Step title="Empacote seu app">
-    Crie um ZIP com os arquivos que a Hyze Cloud deve executar. Inclua o entrypoint do seu app e o manifesto de dependências.
+    Crie um ZIP com os arquivos que a Hyze deve executar: entrypoint do app e manifesto de dependências.
   </Step>
   <Step title="Envie a requisição de deploy">
     ```bash
@@ -35,7 +32,9 @@ Use a API de Apps quando quiser deploys a partir de CI/CD, ferramentas internas 
 
     `startupCommand` é opcional. Omita (ou use `auto`) para a Hyze detectar o comando certo. Override só se precisar: `-F "startupCommand=node server.js"`.
   </Step>
-  <Step title="Veja os logs">
+  <Step title="Verifique o resultado">
+    Consulte `GET /api/apps/:appId` até `status: running` e abra os logs:
+
     ```bash
     curl "https://api.hyzecloud.com/api/apps/app_001/logs?tail=200&timestamps=true" \
       -H "Authorization: Bearer hyze_sua_chave"
@@ -45,7 +44,7 @@ Use a API de Apps quando quiser deploys a partir de CI/CD, ferramentas internas 
 
 ## Deploy pelo GitHub
 
-Use [`POST /api/apps/deploy-from-repo`](/api-reference/apps#deploy-from-github-repo) após conectar o GitHub no Dashboard.
+Use [`POST /api/apps/deploy-from-repo`](/api-reference/apps#deploy-from-github-repo) após conectar o GitHub no dashboard:
 
 ```json
 {
@@ -64,25 +63,39 @@ Use [`POST /api/apps/deploy-from-repo`](/api-reference/apps#deploy-from-github-r
 ```
 
 <Tip>
-  Defina `autoDeploy` como `true` quando quiser que a Hyze Cloud faça redeploy após pushes na branch selecionada.
-  Omita `startupCommand` (ou use `"auto"`) a menos que precise de um comando custom.
+  Com `autoDeploy: true`, pushes na branch disparam novos deploys automaticamente.
 </Tip>
 
-## Checklist de runtimes
+## Runtimes
 
 | Runtime | Auto detect | Observações |
 | --- | --- | --- |
 | `node` | Sim (API, site estático, Vite, Next…) | Exponha a mesma porta em que seu servidor escuta. |
 | `bun` | Sim | Mantenha o lockfile no artefato quando possível. |
-| `python` | Sim | Inclua seu arquivo de dependências no ZIP. |
+| `python` | Sim | Inclua o arquivo de dependências no ZIP. |
 
 Exemplos de override opcional: `node server.js`, `bun run start`, `python main.py`.
 
-## Endpoints relacionados
+<Callout type="info">
+  Com porta exposta, informe o **host completo** como subdomínio (ex.: `my-api.hyzecloud.app`), não só o prefixo.
+</Callout>
+
+## Problemas comuns
+
+<AccordionGroup>
+  <Accordion title="Deploy conclui mas o app não responde">
+    Confira `exposePort` e se o servidor escuta em `0.0.0.0`. Veja os logs para descartar crash no boot.
+  </Accordion>
+  <Accordion title="Comando de start errado">
+    Passe `startupCommand` com override (ex.: `node server.js`) ou deixe `auto` para a detecção padrão.
+  </Accordion>
+</AccordionGroup>
+
+## Próximos passos
 
 <CardGroup cols={2}>
   <Card title="Referência de Apps" icon="cube" href="/api-reference/apps">
-    Deploy, ciclo de vida, logs, configurações e histórico de builds.
+    Deploy, ciclo de vida, logs, configurações e builds.
   </Card>
   <Card title="Backups de app" icon="box-archive" href="/api-reference/apps-backups">
     Crie, restaure, baixe e exclua backups de apps.

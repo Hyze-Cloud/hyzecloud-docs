@@ -1,41 +1,42 @@
 ---
 title: Workspaces
+icon: users
 description: Workspaces agrupam apps, bancos de dados, chaves de API, membros e faturamento.
 ---
 
-Um workspace é o limite do seu time e recursos.
-
-## Objetivo
-
-Entender como os recursos são organizados.
-
-## Quando usar
-
-Use workspaces para separar projetos pessoais, times, clientes ou ambientes.
-
-## Exemplo
-
-```bash
-curl https://api.hyzecloud.com/api/apps/ \
-  -H "Authorization: Bearer hyze_sua_chave"
-```
+Um workspace é o limite do seu time e recursos na Hyze Cloud. Tudo o que você cria — apps, bancos, chaves — pertence a exatamente um workspace.
 
 ## O que pertence a um workspace
 
 - Apps
 - Bancos de dados
-- Membros do time
-- Convites
+- Membros do time e convites
 - Planos e uso
 - Chaves de API
+
+## Como o workspace é determinado
+
+Cada chave de API fica ligada a um workspace. Requisições autenticadas por chave usam automaticamente os recursos daquele workspace — você não precisa passar `workspaceId` na maioria dos casos.
+
+Quando uma sessão de browser não está presente e o endpoint suporta, é possível mirar outro workspace com o parâmetro `?workspaceId=`.
+
+## Quando criar mais de um
+
+Separe workspaces quando quiser isolar:
+
+- Projetos pessoais e clientes diferentes
+- Produção e testes
+- Times com acesso independente
+
+Cada workspace tem plano e faturamento próprios.
 
 ## Próximos passos
 
 <CardGroup cols={2}>
-  <Card title="API de Apps" icon="cube" href="/api-reference/apps">
-    Gerencie apps no seu workspace.
+  <Card title="Chaves de API" icon="key" href="/pt/guides/api-keys">
+    Crie e gerencie o acesso à API do seu workspace.
   </Card>
-  <Card title="Chaves de API" icon="key" href="/api-reference/api-keys">
-    Crie e gerencie acesso à API.
+  <Card title="Referência de Apps" icon="cube" href="/api-reference/apps">
+    Gerencie apps dentro do workspace.
   </Card>
 </CardGroup>

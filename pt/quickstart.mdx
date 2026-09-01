@@ -1,19 +1,35 @@
 ---
 title: Quickstart
-description: Autentique e chame a API da Hyze Cloud em poucos minutos.
+icon: bolt
+description: Do zero até uma requisição autenticada funcionando em poucos minutos.
 ---
 
-Do zero até uma requisição autenticada funcionando.
+Este guia leva você de uma conta nova no dashboard até uma requisição autenticada funcionando. Se ela retornar seus apps, sua autenticação está correta — e qualquer integração seguinte (CI/CD, scripts, backend) vai funcionar do mesmo jeito.
 
-## 1. Criar uma API key
+## Pré-requisitos
 
-1. Abra [hyzecloud.com/dashboard](http://hyzecloud.com/dashboard)
-2. Vá em **Settings → API Keys → Create Key**
-3. Copie a chave (`hyze_...`) — ela só aparece uma vez
+- Uma conta Hyze Cloud ([cadastre-se](http://hyzecloud.com/dashboard))
+- Uma API key (começa com `hyze_`) — se ainda não tem, siga o guia de [chaves de API](/pt/guides/api-keys)
 
-## 2. Chamar a API
+<Callout type="info">
+  A URL base da API é `https://api.hyzecloud.com/api`. Mantenha esse prefixo em toda requisição.
+</Callout>
 
-Base URL: `https://api.hyzecloud.com/api`
+## Criar a API key
+
+<Steps>
+  <Step title="Abra o dashboard">
+    Acesse [hyzecloud.com/dashboard](http://hyzecloud.com/dashboard) e faça login.
+  </Step>
+  <Step title="Navegue até API Keys">
+    Vá em **Settings → Developer** e clique em **New key**.
+  </Step>
+  <Step title="Copie a chave">
+    Ela começa com `hyze_`. Copie — a chave completa aparece só uma vez.
+  </Step>
+</Steps>
+
+## Fazer a primeira requisição
 
 ```bash
 export HYZE_API_KEY="hyze_sua_chave"
@@ -22,9 +38,9 @@ curl https://api.hyzecloud.com/api/apps/ \
   -H "Authorization: Bearer $HYZE_API_KEY"
 ```
 
-Uma lista JSON de apps significa que a autenticação está ok.
+Uma lista JSON dos apps do seu workspace significa que a autenticação está ok.
 
-### Com a SDK
+## Com a SDK
 
 ```bash
 npm install @hyzecloud/sdk
@@ -38,6 +54,20 @@ const { apps } = await hyze.apps.list();
 console.log(apps);
 ```
 
+## Se algo der errado
+
+<AccordionGroup>
+  <Accordion title="401 Unauthorized">
+    A chave não foi enviada, está incorreta/revogada, ou o header não segue o formato `Bearer hyze_...`. Confira o valor de `HYZE_API_KEY` no seu shell com `echo $HYZE_API_KEY`.
+  </Accordion>
+  <Accordion title="404 Not Found">
+    Você provavelmente esqueceu o prefixo `/api` na URL base.
+  </Accordion>
+  <Accordion title="429 Too Many Requests">
+    Rate limit da API. Respeite o header `Retry-After` e tente de novo após os segundos indicados.
+  </Accordion>
+</AccordionGroup>
+
 ## Próximo
 
 <CardGroup cols={2}>
@@ -50,7 +80,7 @@ console.log(apps);
   <Card title="Provisionar database" icon="database" href="/pt/guides/provision-a-database">
     Criar PostgreSQL, MySQL, MongoDB ou Redis.
   </Card>
-  <Card title="API Reference" icon="book-open" href="/api-reference/introduction">
+  <Card title="Referência da API" icon="book-open" href="/api-reference/introduction">
     Todos os endpoints.
   </Card>
 </CardGroup>

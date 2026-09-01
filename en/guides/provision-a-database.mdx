@@ -1,23 +1,16 @@
 ---
 title: Provision a database
-description: Create a managed database and connect it to your app.
+icon: database
+description: Create a managed database and connect it to your app through the API.
 ---
 
-Hyze Cloud can provision PostgreSQL, MySQL, MongoDB, and Redis through the same database lifecycle API.
+Hyze provisions PostgreSQL, MySQL, MongoDB, and Redis through the same API. The flow: create the instance, receive the connection string, inject it into your app.
 
-## Goal
-
-Create a database and connect it to an app.
-
-## When to use
-
-Use this when your app needs persistent storage, cache, queues, or document data.
-
-## Create a database
+## Create the database
 
 <Steps>
-  <Step title="Pick an engine">
-    Choose `postgresql`, `mysql`, `mongodb`, or `redis`.
+  <Step title="Choose an engine">
+    `postgresql`, `mysql`, `mongodb`, or `redis`.
   </Step>
   <Step title="Create the instance">
     ```bash
@@ -33,15 +26,15 @@ Use this when your app needs persistent storage, cache, queues, or document data
     ```
   </Step>
   <Step title="Store the connection string">
-    Copy the returned `connectionString` and save it as an app environment variable.
+    Copy the `connectionString` from the response and save it as an app environment variable. Minimums: 256 MB memory and 1 GB storage.
   </Step>
 </Steps>
 
 <Callout type="warning">
-  Treat connection strings as secrets. Do not commit them to source control or paste them into logs.
+  Treat the connection string as a secret. Never commit it or paste it into logs.
 </Callout>
 
-## Add the connection string to an app
+## Connect it to an app
 
 ```bash
 curl -X PUT https://api.hyzecloud.com/api/apps/app_001/env \
@@ -54,27 +47,34 @@ curl -X PUT https://api.hyzecloud.com/api/apps/app_001/env \
   }'
 ```
 
-## How it works
+Restart the app so the new variable gets injected.
 
-Hyze Cloud provisions the database, returns a connection string, and lets you pass that value to your app through environment variables.
+## Verify the result
 
-## Operate the database
+- Status: `GET /api/databases/:databaseId` — wait for `status: running`
+- Stats: `GET /api/databases/:databaseId/stats`
 
-| Task | Endpoint |
-| --- | --- |
-| View stats | [`GET /api/databases/:databaseId/stats`](/api-reference/databases#get-stats) |
-| Read logs | [`GET /api/databases/:databaseId/logs`](/api-reference/databases#get-logs) |
-| Rotate password | [`POST /api/databases/:databaseId/rotate-password`](/api-reference/databases#rotate-password) |
-| Create backup | [`POST /api/databases/:databaseId/backups`](/api-reference/databases#create-backup) |
-| Restore backup | [`POST /api/databases/:databaseId/restore`](/api-reference/databases#restore-backup) |
+## Common problems
 
-## Related endpoints
+<AccordionGroup>
+  <Accordion title="The database is stuck in provisioning">
+    Creation is asynchronous — the response carries an `operationId`. Track it with `GET /api/databases/:databaseId/operations`.
+  </Accordion>
+  <Accordion title="The app can't connect to the database">
+    Confirm the app was restarted after receiving `DATABASE_URL`, and that the string points to the right instance.
+  </Accordion>
+  <Accordion title="I lost the database password">
+    Rotate it with `POST /api/databases/:databaseId/rotate-password` and update the app's variable.
+  </Accordion>
+</AccordionGroup>
+
+## Next steps
 
 <CardGroup cols={2}>
-  <Card title="Databases reference" icon="database" href="/api-reference/databases">
-    Create, inspect, operate, back up, and restore databases.
+  <Card title="Back up a database" icon="box-archive" href="/en/guides/back-up-a-database">
+    Protect data before risky changes.
   </Card>
-  <Card title="App environment" icon="key" href="/api-reference/apps#set-environment-variables">
-    Store runtime secrets for your app.
+  <Card title="Databases reference" icon="book-open" href="/api-reference/databases">
+    Every endpoint in the database lifecycle.
   </Card>
 </CardGroup>

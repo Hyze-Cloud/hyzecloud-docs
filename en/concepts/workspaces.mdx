@@ -1,41 +1,42 @@
 ---
 title: Workspaces
+icon: users
 description: Workspaces group apps, databases, API keys, members, and billing.
 ---
 
-A workspace is the boundary for your team and resources.
-
-## Goal
-
-Understand how resources are scoped.
-
-## When to use
-
-Use workspaces to separate personal projects, teams, clients, or environments.
-
-## Example
-
-```bash
-curl https://api.hyzecloud.com/api/apps/ \
-  -H "Authorization: Bearer hyze_your_key"
-```
+A workspace is the boundary for your team and resources on Hyze Cloud. Everything you create — apps, databases, keys — belongs to exactly one workspace.
 
 ## What belongs to a workspace
 
 - Apps
 - Databases
-- Team members
-- Invitations
+- Team members and invitations
 - Plans and usage
 - API keys
+
+## How the workspace is determined
+
+Each API key is bound to one workspace. Requests authenticated with a key automatically use that workspace's resources — you don't need to pass `workspaceId` in most cases.
+
+When no browser session is present and the endpoint supports it, you can target another workspace with the `?workspaceId=` query parameter.
+
+## When to create more than one
+
+Separate workspaces when you want to isolate:
+
+- Personal projects from client work
+- Production from testing
+- Teams with independent access
+
+Each workspace has its own plan and billing.
 
 ## Next steps
 
 <CardGroup cols={2}>
-  <Card title="Apps API" icon="cube" href="/api-reference/apps">
-    Manage apps in your workspace.
+  <Card title="API keys" icon="key" href="/en/guides/api-keys">
+    Create and manage API access for your workspace.
   </Card>
-  <Card title="API keys" icon="key" href="/api-reference/api-keys">
-    Create and manage API access.
+  <Card title="Apps reference" icon="cube" href="/api-reference/apps">
+    Manage apps inside the workspace.
   </Card>
 </CardGroup>

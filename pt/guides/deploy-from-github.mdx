@@ -1,19 +1,16 @@
 ---
 title: Deploy pelo GitHub
-description: Faça deploy de um app a partir de um repositório GitHub conectado.
+icon: github
+description: Faça deploy de um app a partir de um repositório GitHub conectado e ative auto deploys.
 ---
 
-Use deploys por GitHub quando seu código-fonte já estiver em um repositório.
+Use deploys por GitHub quando seu código-fonte já estiver em um repositório. A Hyze baixa a branch, instala dependências, detecta o comando de start e inicia o app.
 
-## Objetivo
+## Pré-requisitos
 
-Criar um app a partir de um repositório e opcionalmente ativar auto deploys.
+Conecte o GitHub no dashboard antes de usar este fluxo: **Dashboard → GitHub** (ou verifique o status com `GET /api/integrations/github/status`).
 
-## Quando usar
-
-Use este fluxo para apps de produção, workflows em equipe e deploys por branch.
-
-## Exemplo
+## Deploy de um repositório
 
 ```bash
 curl -X POST https://api.hyzecloud.com/api/apps/deploy-from-repo \
@@ -33,14 +30,28 @@ curl -X POST https://api.hyzecloud.com/api/apps/deploy-from-repo \
   }'
 ```
 
-## Como funciona
-
-A Hyze Cloud baixa a branch selecionada, instala dependências e inicia o app.  
-`startupCommand` é opcional — omita ou use `"auto"` para a Hyze detectar o comando certo (Vite, Next, Node, estático, Python…). Passe um comando custom só quando precisar sobrescrever a detecção.
-
 <Tip>
-  Ative `autoDeploy` para que pushes na branch disparem novos deploys automaticamente.
+  Com `autoDeploy: true`, todo push na branch selecionada dispara um novo deploy automaticamente.
 </Tip>
+
+## Verificar o resultado
+
+1. Confirme o status: `GET /api/apps/:appId` — aguarde `status: running`
+2. Abra os logs: `GET /api/apps/:appId/logs` para ver a inicialização
+
+## Problemas comuns
+
+<AccordionGroup>
+  <Accordion title="404 ao listar repositórios">
+    A integração GitHub não está conectada no workspace, ou o app foi instalado com acesso restrito a outros repositórios. Reconecte em **Dashboard → GitHub**.
+  </Accordion>
+  <Accordion title="Deploy falha na etapa de build">
+    Verifique o histórico: `GET /api/apps/:appId/builds`. Causas comuns: lockfile ausente, versão de runtime incompatível ou comando de start errado. O `startupCommand` é opcional — omita e a Hyze detecta (Vite, Next, Node, estático, Python).
+  </Accordion>
+  <Accordion title="App sobe mas não responde">
+    Confira `exposePort`: ele deve ser a mesma porta em que seu servidor escuta, e o servidor deve aceitar conexões em `0.0.0.0`.
+  </Accordion>
+</AccordionGroup>
 
 ## Próximos passos
 
@@ -48,7 +59,7 @@ A Hyze Cloud baixa a branch selecionada, instala dependências e inicia o app.
   <Card title="Ver logs" icon="terminal" href="/pt/guides/view-logs">
     Inspecione a saída de inicialização e runtime.
   </Card>
-  <Card title="API de Apps" icon="book-open" href="/api-reference/apps">
-    Veja todos os endpoints de apps.
+  <Card title="Referência de Apps" icon="book-open" href="/api-reference/apps">
+    Todos os endpoints de apps, incluindo deploy por ZIP.
   </Card>
 </CardGroup>

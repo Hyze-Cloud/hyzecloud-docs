@@ -1,19 +1,23 @@
 ---
 title: Databases
-description: Databases are managed data services attached to your workspace.
+icon: database
+description: Managed PostgreSQL, MySQL, MongoDB, and Redis instances attached to your workspace.
 ---
 
-Hyze Cloud can provision PostgreSQL, MySQL, MongoDB, and Redis.
+Hyze Cloud provisions and operates managed databases inside your workspace. You create the instance through the API or dashboard, receive a connection string, and inject it into your app as an environment variable.
 
-## Goal
+## Available engines
 
-Understand when to create a database and how it connects to apps.
+| Engine | Typical use |
+| --- | --- |
+| PostgreSQL | Relational data, the default for most APIs |
+| MySQL | Relational data with a MySQL ecosystem |
+| MongoDB | Document data |
+| Redis | Cache, queues, and counters |
 
-## When to use
+## How apps connect
 
-Create a database when your app needs persistent data, queues, cache, or document storage.
-
-## Example
+On creation, Hyze returns a `connectionString`. Store it as an app environment variable:
 
 ```json
 {
@@ -24,19 +28,30 @@ Create a database when your app needs persistent data, queues, cache, or documen
 }
 ```
 
-## How apps connect
+```bash
+curl -X PUT https://api.hyzecloud.com/api/apps/app_001/env \
+  -H "Authorization: Bearer hyze_your_key" \
+  -H "Content-Type: application/json" \
+  -d '{ "envVars": { "DATABASE_URL": "postgresql://user:pass@host:5432/db" } }'
+```
 
-After creation, Hyze Cloud returns a connection string.
+<Callout type="warning">
+  Treat the connection string as a secret. It grants full data access. Never commit it, never paste it into logs, and rotate the password if it leaks — `POST /api/databases/:id/rotate-password`.
+</Callout>
 
-Store it as an app environment variable like `DATABASE_URL`.
+## Operations
+
+Hyze handles the lifecycle: start, stop, stats, logs, backups, and restore. All available through the [databases API](/api-reference/databases).
+
+By default, creation uses `memoryMB: 512` and `storageGB: 5` (minimums of 256 MB and 1 GB).
 
 ## Next steps
 
 <CardGroup cols={2}>
   <Card title="Provision a database" icon="database" href="/en/guides/provision-a-database">
-    Create a database and connect it to an app.
+    Create a database and connect it to an app step by step.
   </Card>
-  <Card title="Databases API" icon="book-open" href="/api-reference/databases">
-    View database endpoints.
+  <Card title="Back up a database" icon="box-archive" href="/en/guides/back-up-a-database">
+    Protect data before risky changes.
   </Card>
 </CardGroup>

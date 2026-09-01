@@ -1,24 +1,19 @@
 ---
 title: Fazer backup de um banco
+icon: box-archive
 description: Crie e restaure backups de banco de dados com segurança.
 ---
 
-Backups protegem dados antes de migrações, mudanças arriscadas ou manutenção em produção.
+Backups protegem seus dados antes de migrações, mudanças de schema, rotação de senha ou qualquer manutenção arriscada em produção.
 
-## Objetivo
-
-Criar um backup manual de um banco de dados.
-
-## Quando usar
-
-Faça backup antes de mudanças de schema, imports, rotação de senha ou manutenção manual.
-
-## Exemplo
+## Criar um backup
 
 ```bash
 curl -X POST https://api.hyzecloud.com/api/databases/db_001/backups \
   -H "Authorization: Bearer hyze_sua_chave"
 ```
+
+Liste os backups existentes com `GET /api/databases/:databaseId/backups` e baixe qualquer um com `GET /api/databases/:databaseId/backups/:backupId/download`.
 
 ## Restaurar
 
@@ -29,17 +24,23 @@ curl -X POST https://api.hyzecloud.com/api/databases/db_001/restore \
   -d '{ "backupId": "backup_db_001" }'
 ```
 
-<Warning>
-  Restaurações podem substituir dados ativos. Confirme o banco de destino antes de executar em produção.
-</Warning>
+<Callout type="warning">
+  A restauração substitui os dados atuais do banco de destino. Confira o `databaseId` antes de executar em produção.
+</Callout>
+
+## Rotina recomendada
+
+- Backup manual antes de toda mudança de schema ou import grande
+- Backup antes de rotacionar a senha do banco
+- Baixe (`download`) backups importantes para armazenamento externo — não dependa só da plataforma
 
 ## Próximos passos
 
 <CardGroup cols={2}>
-  <Card title="API de bancos" icon="database" href="/api-reference/databases">
-    Veja endpoints de backup e restauração.
+  <Card title="Provisionar um banco" icon="database" href="/pt/guides/provision-a-database">
+    Crie um banco primeiro.
   </Card>
-  <Card title="Provisionar um banco" icon="plus" href="/pt/guides/provision-a-database">
-    Crie um novo banco primeiro.
+  <Card title="Referência de bancos" icon="book-open" href="/api-reference/databases">
+    Endpoints de backup e restauração.
   </Card>
 </CardGroup>

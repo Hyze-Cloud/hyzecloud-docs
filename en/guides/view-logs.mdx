@@ -1,24 +1,25 @@
 ---
 title: View app logs
-description: Inspect recent app output from the API.
+icon: scroll
+description: Inspect recent app output through the API to debug failures and runtime behavior.
 ---
 
-Logs help you debug startup failures, crashes, and runtime behavior.
-
-## Goal
-
-Fetch recent log lines for an app.
+Logs show what your app printed to stdout/stderr — the first thing to check when a deploy fails, the app crash-loops, or behavior differs from what you expect.
 
 ## When to use
 
-Use logs after deploys, restarts, environment changes, or incident reports.
+After deploys, restarts, environment variable changes, or incident reports.
 
-## Example
+## Fetch logs
 
 ```bash
 curl "https://api.hyzecloud.com/api/apps/app_001/logs?tail=200&timestamps=true" \
   -H "Authorization: Bearer hyze_your_key"
 ```
+
+<Callout type="info">
+  Logs are recent output, not a full history. To audit past deploys, use build history: `GET /api/apps/:appId/builds`.
+</Callout>
 
 ## Options
 
@@ -26,6 +27,20 @@ curl "https://api.hyzecloud.com/api/apps/app_001/logs?tail=200&timestamps=true" 
 | --- | --- | --- |
 | `tail` | `100` | Number of lines to return. |
 | `timestamps` | `false` | Include timestamps in output. |
+
+## Common problems
+
+<AccordionGroup>
+  <Accordion title="The app errors but logs are empty">
+    The process may never have started. Check status with `GET /api/apps/:appId` and look at build history — the failure may be in the build step, not the runtime.
+  </Accordion>
+  <Accordion title="Logs show nothing after updating environment variables">
+    Variables are injected at startup. Restart the app (`POST /api/apps/:appId/restart`) and fetch logs again.
+  </Accordion>
+  <Accordion title="I need more lines">
+    Increase `tail` (e.g. `?tail=1000`). If the incident already passed, add `&timestamps=true` to align output with the timeline.
+  </Accordion>
+</AccordionGroup>
 
 ## Next steps
 

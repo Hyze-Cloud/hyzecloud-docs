@@ -1,15 +1,12 @@
 ---
 title: App com banco de dados
-description: Crie um banco de dados e passe sua string de conexão para um app.
+icon: boxes-stacked
+description: Crie um banco, passe a string de conexão ao app e rode a stack completa.
 ---
 
-Use este fluxo para APIs que precisam de armazenamento persistente.
+Exemplo ponta a ponta para APIs que precisam de armazenamento persistente: provisionar PostgreSQL e anexá-lo a um app como `DATABASE_URL`.
 
-## Objetivo
-
-Provisionar PostgreSQL e anexá-lo a um app como `DATABASE_URL`.
-
-## Criar o banco de dados
+## 1. Criar o banco
 
 ```bash
 curl -X POST https://api.hyzecloud.com/api/databases/ \
@@ -23,7 +20,9 @@ curl -X POST https://api.hyzecloud.com/api/databases/ \
   }'
 ```
 
-## Definir a variável do app
+Na resposta, guarde `database.id` e `database.connectionString`.
+
+## 2. Definir a variável do app
 
 ```bash
 curl -X PUT https://api.hyzecloud.com/api/apps/app_001/env \
@@ -36,13 +35,26 @@ curl -X PUT https://api.hyzecloud.com/api/apps/app_001/env \
   }'
 ```
 
+## 3. Reiniciar e verificar
+
+```bash
+curl -X POST https://api.hyzecloud.com/api/apps/app_001/restart \
+  -H "Authorization: Bearer hyze_sua_chave"
+```
+
+Confirme que o app subiu com `GET /api/apps/app_001` e que o banco está `running` com `GET /api/databases/db_001`.
+
+<Callout type="info">
+  Variáveis de ambiente são injetadas na inicialização. Sem o restart, o app continua sem ver `DATABASE_URL`.
+</Callout>
+
 ## Próximos passos
 
 <CardGroup cols={2}>
   <Card title="Provisionar um banco" icon="database" href="/pt/guides/provision-a-database">
-    Aprenda o ciclo de vida de bancos de dados.
+    O guia completo do ciclo de vida de bancos.
   </Card>
-  <Card title="Gerenciar segredos" icon="key" href="/pt/guides/manage-secrets">
+  <Card title="Gerenciar secrets" icon="key" href="/pt/guides/manage-secrets">
     Mantenha credenciais seguras.
   </Card>
 </CardGroup>

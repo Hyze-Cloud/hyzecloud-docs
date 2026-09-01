@@ -1,24 +1,19 @@
 ---
 title: Back up a database
+icon: box-archive
 description: Create and restore database backups safely.
 ---
 
-Backups protect data before migrations, risky changes, or production maintenance.
+Backups protect your data before migrations, schema changes, password rotation, or any risky production maintenance.
 
-## Goal
-
-Create a manual backup for a database.
-
-## When to use
-
-Use a backup before schema changes, imports, password rotation, or manual maintenance.
-
-## Example
+## Create a backup
 
 ```bash
 curl -X POST https://api.hyzecloud.com/api/databases/db_001/backups \
   -H "Authorization: Bearer hyze_your_key"
 ```
+
+List existing backups with `GET /api/databases/:databaseId/backups` and download any of them with `GET /api/databases/:databaseId/backups/:backupId/download`.
 
 ## Restore
 
@@ -29,17 +24,23 @@ curl -X POST https://api.hyzecloud.com/api/databases/db_001/restore \
   -d '{ "backupId": "backup_db_001" }'
 ```
 
-<Warning>
-  Restores can replace live data. Confirm the target database before running this in production.
-</Warning>
+<Callout type="warning">
+  Restoring replaces the current data of the target database. Double-check the `databaseId` before running this in production.
+</Callout>
+
+## Recommended routine
+
+- Manual backup before every schema change or large import
+- Backup before rotating the database password
+- Download important backups to external storage — don't rely on the platform alone
 
 ## Next steps
 
 <CardGroup cols={2}>
-  <Card title="Databases API" icon="database" href="/api-reference/databases">
-    View backup and restore endpoints.
+  <Card title="Provision a database" icon="database" href="/en/guides/provision-a-database">
+    Create a database first.
   </Card>
-  <Card title="Provision a database" icon="plus" href="/en/guides/provision-a-database">
-    Create a new database first.
+  <Card title="Databases reference" icon="book-open" href="/api-reference/databases">
+    Backup and restore endpoints.
   </Card>
 </CardGroup>

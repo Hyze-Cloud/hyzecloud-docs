@@ -1,23 +1,16 @@
 ---
 title: Provisionar um banco de dados
-description: Crie um banco de dados gerenciado e conecte-o ao seu app.
+icon: database
+description: Crie um banco gerenciado e conecte-o ao seu app pela API.
 ---
 
-A Hyze Cloud pode provisionar PostgreSQL, MySQL, MongoDB e Redis através da mesma API de ciclo de vida de bancos.
+A Hyze provisiona PostgreSQL, MySQL, MongoDB e Redis pela mesma API. O fluxo: criar a instância, receber a string de conexão, injetá-la no app.
 
-## Objetivo
-
-Criar um banco de dados e conectá-lo a um app.
-
-## Quando usar
-
-Use quando seu app precisar de armazenamento persistente, cache, filas ou dados documentais.
-
-## Criar um banco de dados
+## Criar o banco
 
 <Steps>
   <Step title="Escolha um engine">
-    Escolha `postgresql`, `mysql`, `mongodb` ou `redis`.
+    `postgresql`, `mysql`, `mongodb` ou `redis`.
   </Step>
   <Step title="Crie a instância">
     ```bash
@@ -33,15 +26,15 @@ Use quando seu app precisar de armazenamento persistente, cache, filas ou dados 
     ```
   </Step>
   <Step title="Guarde a string de conexão">
-    Copie o `connectionString` retornado e salve como variável de ambiente do seu app.
+    Copie o `connectionString` da resposta e salve como variável de ambiente do seu app. Mínimos: 256 MB de memória e 1 GB de armazenamento.
   </Step>
 </Steps>
 
 <Callout type="warning">
-  Trate strings de conexão como segredos. Não as commite no controle de versão nem cole em logs.
+  Trate a string de conexão como segredo. Não a commite nem cole em logs.
 </Callout>
 
-## Adicionar a string de conexão a um app
+## Conectar a um app
 
 ```bash
 curl -X PUT https://api.hyzecloud.com/api/apps/app_001/env \
@@ -54,27 +47,34 @@ curl -X PUT https://api.hyzecloud.com/api/apps/app_001/env \
   }'
 ```
 
-## Como funciona
+Reinicie o app para que a nova variável seja injetada.
 
-A Hyze Cloud provisiona o banco, retorna uma string de conexão e permite que você passe esse valor para seu app através de variáveis de ambiente.
+## Verificar o resultado
 
-## Operar o banco de dados
+- Status: `GET /api/databases/:databaseId` — aguarde `status: running`
+- Estatísticas: `GET /api/databases/:databaseId/stats`
 
-| Tarefa | Endpoint |
-| --- | --- |
-| Ver estatísticas | [`GET /api/databases/:databaseId/stats`](/api-reference/databases#get-stats) |
-| Ler logs | [`GET /api/databases/:databaseId/logs`](/api-reference/databases#get-logs) |
-| Rotacionar senha | [`POST /api/databases/:databaseId/rotate-password`](/api-reference/databases#rotate-password) |
-| Criar backup | [`POST /api/databases/:databaseId/backups`](/api-reference/databases#create-backup) |
-| Restaurar backup | [`POST /api/databases/:databaseId/restore`](/api-reference/databases#restore-backup) |
+## Problemas comuns
 
-## Endpoints relacionados
+<AccordionGroup>
+  <Accordion title="O banco ficou preso em provisioning">
+    A criação é assíncrona — a resposta traz um `operationId`. Acompanhe com `GET /api/databases/:databaseId/operations`.
+  </Accordion>
+  <Accordion title="O app não conecta no banco">
+    Confirme que o app foi reiniciado depois de receber `DATABASE_URL` e que a string aponta para a instância certa.
+  </Accordion>
+  <Accordion title="Perdi a senha do banco">
+    Rotacione com `POST /api/databases/:databaseId/rotate-password` e atualize a variável no app.
+  </Accordion>
+</AccordionGroup>
+
+## Próximos passos
 
 <CardGroup cols={2}>
-  <Card title="Referência de bancos" icon="database" href="/api-reference/databases">
-    Crie, inspecione, opere, faça backup e restaure bancos de dados.
+  <Card title="Backup de banco" icon="box-archive" href="/pt/guides/back-up-a-database">
+    Proteja dados antes de mudanças arriscadas.
   </Card>
-  <Card title="Ambiente do app" icon="key" href="/api-reference/apps#set-environment-variables">
-    Armazene segredos de runtime para seu app.
+  <Card title="Referência de bancos" icon="book-open" href="/api-reference/databases">
+    Todos os endpoints do ciclo de vida de bancos.
   </Card>
 </CardGroup>

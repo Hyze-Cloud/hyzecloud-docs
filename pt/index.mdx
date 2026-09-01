@@ -1,53 +1,62 @@
 ---
-title: Introdução
-description: Deploy de apps, bancos gerenciados e automação com a API da Hyze Cloud.
+title: Bem-vindo à documentação da Hyze Cloud
+icon: house
+description: A infraestrutura simples para publicar, conectar e automatizar seus apps.
+mode: custom
 ---
 
-A Hyze Cloud é uma PaaS para rodar apps **Node.js**, **Bun** e **Python**, além de bancos gerenciados — pelo dashboard ou pela REST API.
+<div className="docs-home">
+  <section className="docs-hero" style={{backgroundImage: "linear-gradient(rgba(13, 13, 13, 0.2), rgba(13, 13, 13, 0.72)), url('/images/hero-apostles.webp')"}}>
+    <div className="docs-hero-content">
+      <h1>Publique seus apps.</h1>
+      <p className="docs-hero-copy">Faça deploy de apps Node.js, Bun e Python, conecte bancos gerenciados e automatize sua infraestrutura com uma API clara.</p>
+    </div>
+  </section>
 
-## Comece por aqui
+<section className="docs-section">
+  <div className="docs-section-heading">
+    <h2>Escolha seu próximo passo</h2>
+    <p>Guias objetivos para sair da ideia e chegar ao deploy.</p>
+  </div>
+  <CardGroup cols={2}>
+    <Card
+      title="Quero publicar um app"
+      icon="rocket"
+      href="/pt/guides/deploy-an-app"
+    >
+      Faça deploy de um app Node.js, Bun ou Python em poucos minutos.
+    </Card>
+    <Card
+      title="Quero integrar a API"
+      icon="terminal"
+      href="/api-reference/introduction"
+    >
+      Automatize deploys, recursos e operações com a API REST.
+    </Card>
+  </CardGroup>
+</section>
 
-| Passo | O que fazer |
-| --- | --- |
-| 1 | [Criar uma API key](/pt/getting-started/authentication) |
-| 2 | [Fazer a primeira requisição](/pt/quickstart) |
-| 3 | [Deploy de um app](/pt/guides/deploy-an-app) ou [usar a SDK](/pt/sdks/typescript) |
+<section className="docs-section docs-section-border">
+  <div className="docs-section-heading">
+    <h2>A plataforma</h2>
+    <p>Os recursos essenciais do seu app em um só lugar.</p>
+  </div>
+  <CardGroup cols={2}>
+    <Card title="Apps" icon="box" href="/pt/concepts/apps">
+      ZIP, GitHub, variáveis de ambiente e logs.
+    </Card>
+    <Card title="Databases" icon="database" href="/pt/concepts/databases">
+      PostgreSQL, MySQL, MongoDB e Redis gerenciados.
+    </Card>
+    <Card title="SDK para Node.js" icon="code" href="/pt/sdks/typescript">
+      Automatize sua operação com o SDK oficial.
+    </Card>
+    <Card title="Workspaces" icon="users" href="/pt/concepts/workspaces">
+      Organize recursos, ambientes e colaboradores.
+    </Card>
+  </CardGroup>
+</section>
 
-## Caminhos
 
-<CardGroup cols={2}>
-  <Card title="Quickstart" icon="bolt" href="/pt/quickstart">
-    Primeira requisição autenticada em poucos minutos.
-  </Card>
-  <Card title="SDK Node.js" icon="code" href="/pt/sdks/typescript">
-    Pacote oficial `@hyzecloud/sdk` para Node e Bun.
-  </Card>
-  <Card title="Guias" icon="book" href="/pt/guides/deploy-an-app">
-    Deploy, databases, secrets, logs.
-  </Card>
-  <Card title="API Reference" icon="terminal" href="/api-reference/introduction">
-    Todos os endpoints, playground interativo.
-  </Card>
-</CardGroup>
-
-## Base URL
-
-```text
-https://api.hyzecloud.com/api
-```
-
-Autentique com Bearer token:
-
-```http
-Authorization: Bearer hyze_sua_chave
-```
-
-## O que você pode fazer
-
-- **Apps** — deploy via ZIP ou GitHub, env, logs, backups  
-- **Databases** — PostgreSQL, MySQL, MongoDB, Redis  
-- **Automação** — API keys, invoices, plans, integração GitHub  
-
-## Dashboard
-
-Gerencie recursos em [hyzecloud.com/dashboard](http://hyzecloud.com/dashboard). Use a API para CI/CD, scripts ou tooling próprio.
+  <footer className="docs-home-footer"><span>Hyze Cloud / Docs</span><a href="http://hyzecloud.com/dashboard">Abrir dashboard ↗</a></footer>
+</div>

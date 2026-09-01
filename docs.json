@@ -8,9 +8,9 @@
     "strict": true
   },
   "colors": {
-    "primary": "#7c46ce",
-    "light": "#8b5cf6",
-    "dark": "#7c46ce"
+    "primary": "#6d5dd3",
+    "light": "#8b7fe8",
+    "dark": "#6d5dd3"
   },
   "api": {
     "openapi": {
@@ -51,7 +51,7 @@
       "twitter:card": "summary_large_image",
       "twitter:site": "@hyzecloud",
       "twitter:creator": "@hyzecloud",
-      "theme-color": "#7c46ce",
+      "theme-color": "#6d5dd3",
       "application-name": "Hyze Cloud Docs",
       "apple-mobile-web-app-title": "Hyze Docs",
       "author": "Hyze Cloud",
@@ -77,42 +77,19 @@
     "timestamp": true
   },
   "thumbnails": {
-    "background": "/images/hero-background.png"
+    "background": "/images/hero-apostles.webp"
   },
   "navigation": {
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Dashboard",
-          "href": "http://hyzecloud.com/dashboard",
-          "icon": "rocket"
-        },
-        {
-          "anchor": "Status",
-          "href": "https://status.hyzecloud.com/",
-          "icon": "signal"
-        },
-        {
-          "anchor": "GitHub",
-          "href": "https://github.com/hyze-cloud",
-          "icon": "github"
-        }
-      ]
-    },
     "languages": [
       {
         "language": "en",
         "tabs": [
           {
-            "tab": "Getting Started",
+            "tab": "Get started",
             "groups": [
               {
                 "group": "Get started",
-                "pages": [
-                  "en/index",
-                  "en/quickstart",
-                  "en/getting-started/authentication"
-                ]
+                "pages": ["en/index", "en/quickstart", "en/guides/api-keys"]
               }
             ]
           },
@@ -120,22 +97,22 @@
             "tab": "Guides",
             "groups": [
               {
-                "group": "How-to",
+                "group": "Deploy",
                 "pages": [
                   "en/guides/deploy-an-app",
                   "en/guides/deploy-from-github",
+                  "en/examples/deploy-with-curl",
+                  "en/examples/app-with-database"
+                ]
+              },
+              {
+                "group": "Operate",
+                "pages": [
                   "en/guides/provision-a-database",
                   "en/guides/back-up-a-database",
                   "en/guides/manage-secrets",
                   "en/guides/view-logs",
                   "en/guides/mcp"
-                ]
-              },
-              {
-                "group": "Examples",
-                "pages": [
-                  "en/examples/deploy-with-curl",
-                  "en/examples/app-with-database"
                 ]
               }
             ]
@@ -160,15 +137,12 @@
             "groups": [
               {
                 "group": "Clients",
-                "pages": [
-                  "en/sdks/overview",
-                  "en/sdks/typescript"
-                ]
+                "pages": ["en/sdks/overview", "en/sdks/typescript"]
               }
             ]
           },
           {
-            "tab": "API Reference",
+            "tab": "API reference",
             "groups": [
               {
                 "group": "Overview",
@@ -211,15 +185,11 @@
         "default": true,
         "tabs": [
           {
-            "tab": "Começar",
+            "tab": "Comece aqui",
             "groups": [
               {
-                "group": "Começar",
-                "pages": [
-                  "pt/index",
-                  "pt/quickstart",
-                  "pt/getting-started/authentication"
-                ]
+                "group": "Comece aqui",
+                "pages": ["pt/index", "pt/quickstart", "pt/guides/api-keys"]
               }
             ]
           },
@@ -227,22 +197,22 @@
             "tab": "Guias",
             "groups": [
               {
-                "group": "Como fazer",
+                "group": "Deploy",
                 "pages": [
                   "pt/guides/deploy-an-app",
                   "pt/guides/deploy-from-github",
+                  "pt/examples/deploy-with-curl",
+                  "pt/examples/app-with-database"
+                ]
+              },
+              {
+                "group": "Operação",
+                "pages": [
                   "pt/guides/provision-a-database",
                   "pt/guides/back-up-a-database",
                   "pt/guides/manage-secrets",
                   "pt/guides/view-logs",
                   "pt/guides/mcp"
-                ]
-              },
-              {
-                "group": "Exemplos",
-                "pages": [
-                  "pt/examples/deploy-with-curl",
-                  "pt/examples/app-with-database"
                 ]
               }
             ]
@@ -267,15 +237,12 @@
             "groups": [
               {
                 "group": "Clientes",
-                "pages": [
-                  "pt/sdks/overview",
-                  "pt/sdks/typescript"
-                ]
+                "pages": ["pt/sdks/overview", "pt/sdks/typescript"]
               }
             ]
           },
           {
-            "tab": "API Reference",
+            "tab": "Referência da API",
             "groups": [
               {
                 "group": "Visão geral",

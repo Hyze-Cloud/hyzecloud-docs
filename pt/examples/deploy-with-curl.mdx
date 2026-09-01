@@ -1,15 +1,12 @@
 ---
 title: Deploy com curl
-description: Faça deploy de um artefato ZIP usando apenas curl.
+icon: terminal
+description: Faça deploy de um artefato ZIP usando apenas curl — o caminho mínimo para CI.
 ---
 
-Este é o menor caminho de deploy para sistemas de CI que produzem um artefato ZIP.
+Este é o menor caminho de deploy para sistemas de CI que produzem um artefato ZIP: um `curl`, nada de SDK.
 
-## Objetivo
-
-Fazer deploy de `app.zip` como um app na Hyze Cloud.
-
-## Exemplo
+## Deploy
 
 ```bash
 export HYZE_API_KEY="hyze_sua_chave"
@@ -29,13 +26,39 @@ curl -X POST https://api.hyzecloud.com/api/apps/deploy \
   -F "startupCommand=node server.js"
 ```
 
+## Em um script de CI
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+response=$(curl -sf -X POST https://api.hyzecloud.com/api/apps/deploy \
+  -H "Authorization: Bearer $HYZE_API_KEY" \
+  -F "file=@app.zip" \
+  -F "name=my-api" \
+  -F "runtime=node" \
+  -F "memoryMB=512" \
+  -F "exposePort=3000")
+
+echo "Deploy enviado: $response"
+```
+
+`set -euo pipefail` garante que o pipeline falhe se o deploy falhar — sem deploy silenciosamente quebrado.
+
+## Verificar
+
+```bash
+curl https://api.hyzecloud.com/api/apps/ \
+  -H "Authorization: Bearer $HYZE_API_KEY"
+```
+
 ## Próximos passos
 
 <CardGroup cols={2}>
   <Card title="Ver logs" icon="terminal" href="/pt/guides/view-logs">
     Confirme que o app iniciou corretamente.
   </Card>
-  <Card title="Gerenciar segredos" icon="key" href="/pt/guides/manage-secrets">
+  <Card title="Gerenciar secrets" icon="key" href="/pt/guides/manage-secrets">
     Adicione variáveis de ambiente de produção.
   </Card>
 </CardGroup>

@@ -1,15 +1,12 @@
 ---
-title: App with database
-description: Create a database and pass its connection string to an app.
+title: App with a database
+icon: boxes-stacked
+description: Create a database, pass its connection string to the app, and run the full stack.
 ---
 
-Use this flow for APIs that need persistent storage.
+An end-to-end example for APIs that need persistent storage: provision PostgreSQL and attach it to an app as `DATABASE_URL`.
 
-## Goal
-
-Provision PostgreSQL and attach it to an app as `DATABASE_URL`.
-
-## Create the database
+## 1. Create the database
 
 ```bash
 curl -X POST https://api.hyzecloud.com/api/databases/ \
@@ -23,7 +20,9 @@ curl -X POST https://api.hyzecloud.com/api/databases/ \
   }'
 ```
 
-## Set the app variable
+From the response, keep `database.id` and `database.connectionString`.
+
+## 2. Set the app variable
 
 ```bash
 curl -X PUT https://api.hyzecloud.com/api/apps/app_001/env \
@@ -36,11 +35,24 @@ curl -X PUT https://api.hyzecloud.com/api/apps/app_001/env \
   }'
 ```
 
+## 3. Restart and verify
+
+```bash
+curl -X POST https://api.hyzecloud.com/api/apps/app_001/restart \
+  -H "Authorization: Bearer hyze_your_key"
+```
+
+Confirm the app is up with `GET /api/apps/app_001` and the database is `running` with `GET /api/databases/db_001`.
+
+<Callout type="info">
+  Environment variables are injected at startup. Without the restart, the app never sees `DATABASE_URL`.
+</Callout>
+
 ## Next steps
 
 <CardGroup cols={2}>
   <Card title="Provision a database" icon="database" href="/en/guides/provision-a-database">
-    Learn the database lifecycle.
+    The full database lifecycle guide.
   </Card>
   <Card title="Manage secrets" icon="key" href="/en/guides/manage-secrets">
     Keep credentials safe.

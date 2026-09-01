@@ -1,19 +1,20 @@
 ---
 title: Apps
+icon: cube
 description: Apps are deployable services that run your application code.
 ---
 
-An app is the main unit you deploy on Hyze Cloud.
+An app is the main unit you publish on Hyze Cloud: an API, worker, dashboard, bot, or background service running in a managed container.
 
-## Goal
+## What an app includes
 
-Understand what an app contains before deploying one.
+Every app carries:
 
-## When to use
-
-Use apps for APIs, workers, dashboards, bots, and background services.
-
-## Example
+- Runtime configuration (`node`, `bun`, or `python`)
+- Environment variables
+- Logs and build history
+- Backups
+- Filesystem access
 
 ```json
 {
@@ -24,27 +25,33 @@ Use apps for APIs, workers, dashboards, bots, and background services.
 }
 ```
 
-`startupCommand` is optional. Omit it (or set `"auto"`) and Hyze detects how to start the app. Pass a custom command only when you need to override detection.
+`startupCommand` is optional. Omit it (or set `"auto"`) and Hyze detects how to start the app — Vite, Next, Node, static sites, and Python are recognized automatically. Pass a custom command only when you need to override detection.
 
-## What an app includes
+## How an app runs
 
-- Runtime configuration
-- Environment variables
-- Logs
-- Filesystem access
-- Backups
-- Build history
+Every request to a published app goes through the Hyze proxy before reaching your container. The proxy resolves the subdomain, applies rate limits, and forwards traffic to the exposed port.
+
+```text
+Client → Hyze proxy → your container
+```
+
+Two practical consequences:
+
+- Your app must listen on `0.0.0.0`, not `localhost`
+- The port configured in `exposePort` must match the port your server listens on
+
+## Limits
+
+- Configurable memory per app (`memoryMB`)
+- Public proxy rate limits: 80 req/s per IP and 400 req/s per host — see [Rate limits](/en/concepts/rate-limits)
 
 ## Next steps
 
 <CardGroup cols={2}>
   <Card title="Deploy an app" icon="rocket" href="/en/guides/deploy-an-app">
-    Deploy from a ZIP artifact.
+    Publish from ZIP or GitHub.
   </Card>
-  <Card title="Rate limits" icon="gauge-high" href="/en/concepts/rate-limits">
-    Public proxy and API limits.
-  </Card>
-  <Card title="Apps API" icon="book-open" href="/api-reference/apps">
-    View app endpoints.
+  <Card title="Apps reference" icon="book-open" href="/api-reference/apps">
+    Endpoints for lifecycle, logs, env, and backups.
   </Card>
 </CardGroup>
