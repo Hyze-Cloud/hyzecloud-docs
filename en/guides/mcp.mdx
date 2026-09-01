@@ -56,6 +56,13 @@ Store the key somewhere safe (password manager or environment variable). It is b
 
 <Steps>
   <Step>
+    Export your API key as an environment variable:
+
+    ```bash
+    export HYZE_API_KEY="hyze_your_key"
+    ```
+  </Step>
+  <Step>
     Add the MCP server:
 
     ```bash
@@ -73,7 +80,7 @@ Store the key somewhere safe (password manager or environment variable). It is b
 </Steps>
 
 <Note>
-  Codex reads the token from the `HYZE_API_KEY` environment variable instead of storing it in its config file. If the variable doesn't exist in your environment yet, export `HYZE_API_KEY="hyze_your_key"` first.
+  Codex reads the token from the environment variable instead of storing it in its config file. Keep `HYZE_API_KEY` in your shell profile or CI environment.
 </Note>
 
 ## Set up in other clients
