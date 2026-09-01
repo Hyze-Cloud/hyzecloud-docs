@@ -52,6 +52,37 @@ Store the key somewhere safe (password manager or environment variable). It is b
   Configuration syntax can vary between versions. If the command fails, check your client version — we recommend the latest one.
 </Note>
 
+## Set up in Codex
+
+<Steps>
+  <Step>
+    Export your API key as an environment variable:
+
+    ```bash
+    export HYZE_API_KEY="hyze_your_key"
+    ```
+  </Step>
+  <Step>
+    Add the MCP server:
+
+    ```bash
+    codex mcp add hyze --url https://mcp.hyzecloud.com/mcp \
+      --bearer-token-env-var HYZE_API_KEY
+    ```
+  </Step>
+  <Step>
+    Verify the connection:
+
+    ```bash
+    codex mcp list
+    ```
+  </Step>
+</Steps>
+
+<Note>
+  Codex reads the token from the environment variable instead of storing it in its config file. Keep `HYZE_API_KEY` in your shell profile or CI environment.
+</Note>
+
 ## Set up in other clients
 
 Any MCP client with "Streamable HTTP" support works with:
