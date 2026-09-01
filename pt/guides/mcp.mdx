@@ -55,13 +55,6 @@ Guarde a key em um lugar seguro (gerenciador de senhas ou variável de ambiente)
 
 <Steps>
   <Step>
-    Exporte sua API key como variável de ambiente:
-
-    ```bash
-    export HYZE_API_KEY="hyze_sua_chave"
-    ```
-  </Step>
-  <Step>
     Adicione o servidor MCP:
 
     ```bash
@@ -79,7 +72,7 @@ Guarde a key em um lugar seguro (gerenciador de senhas ou variável de ambiente)
 </Steps>
 
 <Note>
-  O Codex lê o token da variável de ambiente em vez de gravá-lo no arquivo de configuração. Mantenha `HYZE_API_KEY` no seu shell profile ou ambiente de CI.
+  O Codex lê o token da variável de ambiente `HYZE_API_KEY` em vez de gravá-lo no arquivo de configuração. Se a variável ainda não existir no seu ambiente, exporte `HYZE_API_KEY="hyze_sua_chave"` antes.
 </Note>
 
 ## Configurar em outros clientes
