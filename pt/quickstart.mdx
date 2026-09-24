@@ -43,11 +43,11 @@ Uma lista JSON dos apps do seu workspace significa que a autenticação está ok
 ## Com a SDK
 
 ```bash
-npm install @hyzecloud/sdk
+npm install @hyze-cloud/sdk
 ```
 
 ```ts
-import { HyzeCloud } from "@hyzecloud/sdk";
+import { HyzeCloud } from "@hyze-cloud/sdk";
 
 const hyze = new HyzeCloud({ apiKey: process.env.HYZE_API_KEY });
 const { apps } = await hyze.apps.list();

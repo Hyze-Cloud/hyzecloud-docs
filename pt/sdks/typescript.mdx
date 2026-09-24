@@ -1,11 +1,11 @@
 ---
 title: TypeScript / Node / Bun
 icon: code
-description: SDK oficial @hyzecloud/sdk para Node.js e Bun — cliente tipado da API Hyze Cloud.
-keywords: ["Hyze Cloud", "SDK", "TypeScript", "Node.js", "Bun", "API client", "@hyzecloud/sdk"]
+description: SDK oficial @hyze-cloud/sdk para Node.js e Bun — cliente tipado da API Hyze Cloud.
+keywords: ["Hyze Cloud", "SDK", "TypeScript", "Node.js", "Bun", "API client", "@hyze-cloud/sdk"]
 ---
 
-Pacote oficial **`@hyzecloud/sdk`** para **Node.js 18+** e **Bun**.
+Pacote oficial **`@hyze-cloud/sdk`** para **Node.js 18+** e **Bun**.
 
 - Zero dependências de runtime (`fetch` nativo)
 - Helpers tipados para apps, databases, API keys, invoices, GitHub, plans
@@ -14,15 +14,15 @@ Pacote oficial **`@hyzecloud/sdk`** para **Node.js 18+** e **Bun**.
 ## Instalação
 
 ```bash
-npm install @hyzecloud/sdk
+npm install @hyze-cloud/sdk
 # ou
-bun add @hyzecloud/sdk
+bun add @hyze-cloud/sdk
 ```
 
 ## Quickstart
 
 ```ts
-import { HyzeCloud, HyzeError } from "@hyzecloud/sdk";
+import { HyzeCloud, HyzeError } from "@hyze-cloud/sdk";
 
 const hyze = new HyzeCloud({
   apiKey: process.env.HYZE_API_KEY, // hyze_...
@@ -233,7 +233,7 @@ await hyze.request("/apps/", {
 
 ## Links
 
-- npm: [`@hyzecloud/sdk`](https://www.npmjs.com/package/@hyzecloud/sdk)
+- npm: [`@hyze-cloud/sdk`](https://www.npmjs.com/package/@hyze-cloud/sdk)
 - Código: [github.com/hyze-cloud/hyzecloud-sdk-ts](https://github.com/hyze-cloud/hyzecloud-sdk-ts)
 - [Referência da API](/api-reference/introduction)
 - [Rate limits](/pt/concepts/rate-limits)

@@ -1,0 +1,278 @@
+---
+title: Python
+icon: code
+description: Official hyze-cloud package for Python 3.10+ — sync and async client for the Hyze Cloud API.
+keywords: ["Hyze Cloud", "SDK", "Python", "asyncio", "API client", "hyze-cloud"]
+---
+
+Official **`hyze-cloud`** package for **Python 3.10+**.
+
+- **Sync and async** clients with the same surface
+- Typed helpers for apps, databases, API keys, invoices, GitHub, plans
+- One dependency: `httpx`
+- Consistent `HyzeError` with status, code, and `Retry-After`
+- Ships `py.typed`, so your editor and type checker see the shapes
+
+It is a port of the [TypeScript SDK](/en/sdks/typescript): same resources, same routes, same
+error shape. The one deliberate difference is naming — you write `snake_case` (`memory_mb`) and
+the SDK translates it to the API's `camelCase` (`memoryMB`).
+
+## Install
+
+```bash
+pip install hyze-cloud
+# or
+uv add hyze-cloud
+```
+
+## Quickstart
+
+```python
+from hyzecloud import HyzeCloud, HyzeError
+
+client = HyzeCloud(
+    # api_key="hyze_...",                       # defaults to $HYZE_API_KEY
+    # base_url="https://api.hyzecloud.com/api", # the default
+    # workspace_id="org_...",                   # optional scope
+)
+
+for app in client.apps.list()["apps"]:
+    print(app["name"], app["status"])
+
+try:
+    client.apps.restart("app_001")
+except HyzeError as err:
+    print(err.status, err.code, err.message)
+    if err.is_rate_limited:
+        print("Retry after", err.retry_after_seconds, "s")
+    raise
+```
+
+Close the client when you are done, or use it as a context manager:
+
+```python
+with HyzeCloud() as client:
+    client.plans.current()
+```
+
+## Async
+
+The same calls, awaited — the client to reach for inside FastAPI or any asyncio program:
+
+```python
+import asyncio
+from hyzecloud import AsyncHyzeCloud
+
+
+async def main() -> None:
+    async with AsyncHyzeCloud() as client:
+        apps = await client.apps.list()
+        print(len(apps["apps"]))
+
+
+asyncio.run(main())
+```
+
+## Configuration
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `api_key` | `$HYZE_API_KEY` | Bearer token (`hyze_...`) |
+| `base_url` | `https://api.hyzecloud.com/api` | API base URL |
+| `workspace_id` | — | Optional workspace scope for multi-workspace keys |
+| `timeout` | `60.0` | Per-request timeout in seconds (`None` disables it) |
+| `headers` | — | Extra headers on every request |
+| `transport` | — | Custom `httpx` transport |
+
+### Environment variables
+
+| Variable | Description |
+| --- | --- |
+| `HYZE_API_KEY` | Default API key if `api_key` is omitted |
+| `HYZE_API_URL` | Override base URL |
+
+Create a key in the [dashboard](http://hyzecloud.com/dashboard) or via the API. See [Authentication](/en/guides/api-keys).
+
+## Apps
+
+```python
+# List / get
+apps = client.apps.list()["apps"]
+detail = client.apps.get("app_001")["container"]
+# detail: status, publicUrl, stats, runtime, ...
+
+# Lifecycle
+client.apps.start("app_001")
+client.apps.stop("app_001")
+client.apps.restart("app_001")
+
+# Logs & env
+client.apps.logs("app_001", tail=200, timestamps=True)
+client.apps.get_env("app_001")
+client.apps.set_env("app_001", {
+    "APP_ENV": "production",
+    "LOG_LEVEL": "info",
+})
+
+# Settings
+client.apps.update_settings("app_001", name="my-api", memory_mb=512, auto_restart=True)
+```
+
+### Deploy from ZIP
+
+When exposing a port, **subdomain must be a full host** on the platform domain (e.g. `my-api.hyzecloud.app`), not only the label.
+
+```python
+client.apps.deploy_from_zip(
+    file="./app.zip",  # a path, raw bytes, or an open file
+    name="my-api",
+    runtime="python",  # "node" | "bun" | "python"
+    memory_mb=512,
+    # startup_command optional — omit or "auto" to let Hyze detect
+    expose_port=8000,
+    subdomain="my-api.hyzecloud.app",
+    env_vars={"APP_ENV": "production"},
+)
+
+# Custom start when you need full control:
+# client.apps.deploy_from_zip(..., startup_command="uvicorn main:app --host 0.0.0.0")
+```
+
+A path is read into memory. Pass an open file to stream a large archive instead:
+
+```python
+with open("./app.zip", "rb") as archive:
+    client.apps.deploy_from_zip(
+        file=archive, name="my-api", runtime="python", memory_mb=512
+    )
+```
+
+### Deploy from GitHub
+
+```python
+client.apps.deploy_from_repo(
+    name="my-api",
+    runtime="python",
+    memory_mb=512,
+    expose_port=8000,
+    subdomain="my-api.hyzecloud.app",
+    repository={
+        "id": 123,
+        "owner": "acme",
+        "name": "api",
+        "branch": "main",
+    },
+)
+```
+
+### App backups
+
+```python
+client.apps.create_backup("app_001")
+client.apps.list_backups("app_001")
+client.apps.restore_backup("app_001", "backup_001")
+```
+
+### Env var rules
+
+The API rejects reserved keys such as `NODE_ENV`, `PORT`, `PATH`, `HOME`, and prefixes like `HYZE_`, `DOCKER_`, `AWS_`. Prefer app-specific names (`APP_ENV`, `DATABASE_URL`, …).
+
+## Databases
+
+```python
+client.databases.create(
+    name="prod-postgres",
+    engine="postgresql",  # postgresql | mysql | mongodb | redis
+    memory_mb=1024,
+    storage_gb=20,
+)
+
+client.databases.list()["databases"]
+client.databases.get("db_001")
+client.databases.stats("db_001")
+client.databases.logs("db_001", tail=100)
+
+client.databases.start("db_001")
+client.databases.stop("db_001")
+
+client.databases.create_backup("db_001")
+client.databases.list_backups("db_001")
+```
+
+## API keys, invoices, GitHub, plans
+
+```python
+keys = client.api_keys.list()["keys"]
+created = client.api_keys.create(name="ci")
+# created["key"]["key"] — one-time secret (only on create)
+
+invoices = client.invoices.list()["invoices"]
+pix = client.invoices.create_pix(plan_id="pro", interval="month")
+# pix["invoice"]["brCode"] / ["brCodeBase64"]
+
+client.github.status()
+client.github.repos()
+
+current = client.plans.current()
+# current["plan"] + current["usage"]
+```
+
+## Resources map
+
+| Resource | Methods |
+| --- | --- |
+| `client.apps` | list, get, delete, start, stop, restart, logs, deployments, get_env, set_env, update_settings, deploy_from_zip, deploy_from_repo, inspect_env, create_backup, list_backups, delete_backups, restore_backup, download_backup |
+| `client.databases` | list, get, create, delete, update_settings, stats, logs, start, stop, rotate_password, create_backup, list_backups, download_backup, restore, operations |
+| `client.api_keys` | list, create, update, delete |
+| `client.invoices` | list, create_pix, status |
+| `client.github` | status, install_url, disconnect, repos, branches, detect_runtime |
+| `client.plans` | current, list |
+
+## Low-level requests
+
+Any path under the API base:
+
+```python
+client.get("/apps/")
+client.post("/apps/app_001/restart")
+client.request("GET", "/apps/", query={"workspaceId": "org_1"})
+```
+
+## Errors
+
+`HyzeError` is raised on non-2xx (and on some error-shaped 200 bodies):
+
+| Attribute | Description |
+| --- | --- |
+| `status` | HTTP status |
+| `code` | API error code when present |
+| `message` | Human-readable message |
+| `body` | Parsed response body |
+| `retry_after_seconds` | From `Retry-After` (rate limits) |
+| `is_rate_limited` | `status == 429` |
+| `is_unauthorized` | `401` / `403` |
+| `is_not_found` | `404` |
+
+## Links
+
+- PyPI: [`hyze-cloud`](https://pypi.org/project/hyze-cloud/)
+- Source: [github.com/hyze-cloud/hyzecloud-sdk-python](https://github.com/hyze-cloud/hyzecloud-sdk-python)
+- [API reference](/api-reference/introduction)
+- [Rate limits](/en/concepts/rate-limits)
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="key" href="/en/guides/api-keys">
+    How API keys work.
+  </Card>
+  <Card title="Deploy an app" icon="rocket" href="/en/guides/deploy-an-app">
+    ZIP deploy guide.
+  </Card>
+  <Card title="Provision a database" icon="database" href="/en/guides/provision-a-database">
+    Create managed databases.
+  </Card>
+  <Card title="API reference" icon="book-open" href="/api-reference/introduction">
+    All REST endpoints.
+  </Card>
+</CardGroup>
