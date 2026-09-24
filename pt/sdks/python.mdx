@@ -1,0 +1,279 @@
+---
+title: Python
+icon: code
+description: Pacote oficial hyze-cloud para Python 3.10+ — cliente sync e async da API Hyze Cloud.
+keywords: ["Hyze Cloud", "SDK", "Python", "asyncio", "API client", "hyze-cloud"]
+---
+
+Pacote oficial **`hyze-cloud`** para **Python 3.10+**.
+
+- Cliente **sync e async** com a mesma superfície
+- Helpers tipados para apps, databases, API keys, invoices, GitHub, plans
+- Uma dependência: `httpx`
+- `HyzeError` consistente com status, code e `Retry-After`
+- Publica `py.typed`, então seu editor e o type checker enxergam os tipos
+
+É um port do [SDK TypeScript](/pt/sdks/typescript): mesmos recursos, mesmas rotas, mesmo
+formato de erro. A única diferença deliberada é o nome dos argumentos — você escreve
+`snake_case` (`memory_mb`) e o SDK traduz para o `camelCase` da API (`memoryMB`).
+
+## Instalação
+
+```bash
+pip install hyze-cloud
+# ou
+uv add hyze-cloud
+```
+
+## Quickstart
+
+```python
+from hyzecloud import HyzeCloud, HyzeError
+
+client = HyzeCloud(
+    # api_key="hyze_...",                       # padrão: $HYZE_API_KEY
+    # base_url="https://api.hyzecloud.com/api", # o padrão
+    # workspace_id="org_...",                   # escopo opcional
+)
+
+for app in client.apps.list()["apps"]:
+    print(app["name"], app["status"])
+
+try:
+    client.apps.restart("app_001")
+except HyzeError as err:
+    print(err.status, err.code, err.message)
+    if err.is_rate_limited:
+        print("Retry after", err.retry_after_seconds, "s")
+    raise
+```
+
+Feche o cliente no fim, ou use como context manager:
+
+```python
+with HyzeCloud() as client:
+    client.plans.current()
+```
+
+## Async
+
+As mesmas chamadas, com `await` — o cliente para usar dentro de FastAPI ou de qualquer
+programa asyncio:
+
+```python
+import asyncio
+from hyzecloud import AsyncHyzeCloud
+
+
+async def main() -> None:
+    async with AsyncHyzeCloud() as client:
+        apps = await client.apps.list()
+        print(len(apps["apps"]))
+
+
+asyncio.run(main())
+```
+
+## Configuração
+
+| Opção | Padrão | Descrição |
+| --- | --- | --- |
+| `api_key` | `$HYZE_API_KEY` | Bearer token (`hyze_...`) |
+| `base_url` | `https://api.hyzecloud.com/api` | URL base da API |
+| `workspace_id` | — | Escopo opcional de workspace para chaves multi-workspace |
+| `timeout` | `60.0` | Timeout por request em segundos (`None` desliga) |
+| `headers` | — | Headers extras em todo request |
+| `transport` | — | Transport customizado do `httpx` |
+
+### Variáveis de ambiente
+
+| Variável | Descrição |
+| --- | --- |
+| `HYZE_API_KEY` | API key padrão quando `api_key` é omitido |
+| `HYZE_API_URL` | Sobrescreve a URL base |
+
+Crie uma chave no [dashboard](http://hyzecloud.com/dashboard) ou pela API. Veja [Autenticação](/pt/guides/api-keys).
+
+## Apps
+
+```python
+# Listar / buscar
+apps = client.apps.list()["apps"]
+detail = client.apps.get("app_001")["container"]
+# detail: status, publicUrl, stats, runtime, ...
+
+# Ciclo de vida
+client.apps.start("app_001")
+client.apps.stop("app_001")
+client.apps.restart("app_001")
+
+# Logs e env
+client.apps.logs("app_001", tail=200, timestamps=True)
+client.apps.get_env("app_001")
+client.apps.set_env("app_001", {
+    "APP_ENV": "production",
+    "LOG_LEVEL": "info",
+})
+
+# Settings
+client.apps.update_settings("app_001", name="my-api", memory_mb=512, auto_restart=True)
+```
+
+### Deploy a partir de ZIP
+
+Ao expor uma porta, o **subdomain precisa ser um host completo** no domínio da plataforma (ex.: `my-api.hyzecloud.app`), não só o rótulo.
+
+```python
+client.apps.deploy_from_zip(
+    file="./app.zip",  # um caminho, bytes crus, ou um arquivo aberto
+    name="my-api",
+    runtime="python",  # "node" | "bun" | "python"
+    memory_mb=512,
+    # startup_command é opcional — omitir ou "auto" deixa o Hyze detectar
+    expose_port=8000,
+    subdomain="my-api.hyzecloud.app",
+    env_vars={"APP_ENV": "production"},
+)
+
+# Comando de start customizado, quando você quer controle total:
+# client.apps.deploy_from_zip(..., startup_command="uvicorn main:app --host 0.0.0.0")
+```
+
+Um caminho é lido para a memória. Passe um arquivo aberto para fazer streaming de um ZIP grande:
+
+```python
+with open("./app.zip", "rb") as archive:
+    client.apps.deploy_from_zip(
+        file=archive, name="my-api", runtime="python", memory_mb=512
+    )
+```
+
+### Deploy a partir do GitHub
+
+```python
+client.apps.deploy_from_repo(
+    name="my-api",
+    runtime="python",
+    memory_mb=512,
+    expose_port=8000,
+    subdomain="my-api.hyzecloud.app",
+    repository={
+        "id": 123,
+        "owner": "acme",
+        "name": "api",
+        "branch": "main",
+    },
+)
+```
+
+### Backups de app
+
+```python
+client.apps.create_backup("app_001")
+client.apps.list_backups("app_001")
+client.apps.restore_backup("app_001", "backup_001")
+```
+
+### Regras de env vars
+
+A API recusa chaves reservadas como `NODE_ENV`, `PORT`, `PATH`, `HOME`, e prefixos como `HYZE_`, `DOCKER_`, `AWS_`. Prefira nomes específicos do app (`APP_ENV`, `DATABASE_URL`, …).
+
+## Databases
+
+```python
+client.databases.create(
+    name="prod-postgres",
+    engine="postgresql",  # postgresql | mysql | mongodb | redis
+    memory_mb=1024,
+    storage_gb=20,
+)
+
+client.databases.list()["databases"]
+client.databases.get("db_001")
+client.databases.stats("db_001")
+client.databases.logs("db_001", tail=100)
+
+client.databases.start("db_001")
+client.databases.stop("db_001")
+
+client.databases.create_backup("db_001")
+client.databases.list_backups("db_001")
+```
+
+## API keys, invoices, GitHub, plans
+
+```python
+keys = client.api_keys.list()["keys"]
+created = client.api_keys.create(name="ci")
+# created["key"]["key"] — segredo mostrado uma única vez, na criação
+
+invoices = client.invoices.list()["invoices"]
+pix = client.invoices.create_pix(plan_id="pro", interval="month")
+# pix["invoice"]["brCode"] / ["brCodeBase64"]
+
+client.github.status()
+client.github.repos()
+
+current = client.plans.current()
+# current["plan"] + current["usage"]
+```
+
+## Mapa de recursos
+
+| Recurso | Métodos |
+| --- | --- |
+| `client.apps` | list, get, delete, start, stop, restart, logs, deployments, get_env, set_env, update_settings, deploy_from_zip, deploy_from_repo, inspect_env, create_backup, list_backups, delete_backups, restore_backup, download_backup |
+| `client.databases` | list, get, create, delete, update_settings, stats, logs, start, stop, rotate_password, create_backup, list_backups, download_backup, restore, operations |
+| `client.api_keys` | list, create, update, delete |
+| `client.invoices` | list, create_pix, status |
+| `client.github` | status, install_url, disconnect, repos, branches, detect_runtime |
+| `client.plans` | current, list |
+
+## Requests de baixo nível
+
+Qualquer caminho sob a base da API:
+
+```python
+client.get("/apps/")
+client.post("/apps/app_001/restart")
+client.request("GET", "/apps/", query={"workspaceId": "org_1"})
+```
+
+## Erros
+
+`HyzeError` é levantado em respostas não-2xx (e em alguns corpos 2xx com formato de erro):
+
+| Atributo | Descrição |
+| --- | --- |
+| `status` | Status HTTP |
+| `code` | Código de erro da API, quando presente |
+| `message` | Mensagem legível |
+| `body` | Corpo da resposta já decodificado |
+| `retry_after_seconds` | Do header `Retry-After` (rate limits) |
+| `is_rate_limited` | `status == 429` |
+| `is_unauthorized` | `401` / `403` |
+| `is_not_found` | `404` |
+
+## Links
+
+- PyPI: [`hyze-cloud`](https://pypi.org/project/hyze-cloud/)
+- Código: [github.com/hyze-cloud/hyzecloud-sdk-python](https://github.com/hyze-cloud/hyzecloud-sdk-python)
+- [Referência da API](/api-reference/introduction)
+- [Rate limits](/pt/concepts/rate-limits)
+
+## Próximos passos
+
+<CardGroup cols={2}>
+  <Card title="Autenticação" icon="key" href="/pt/guides/api-keys">
+    Como funcionam as API keys.
+  </Card>
+  <Card title="Deploy de app" icon="rocket" href="/pt/guides/deploy-an-app">
+    Guia de deploy via ZIP.
+  </Card>
+  <Card title="Provisionar database" icon="database" href="/pt/guides/provision-a-database">
+    Criar bancos gerenciados.
+  </Card>
+  <Card title="Referência da API" icon="book-open" href="/api-reference/introduction">
+    Todos os endpoints REST.
+  </Card>
+</CardGroup>

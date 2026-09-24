@@ -13,25 +13,43 @@ A API continua sendo a fonte da verdade. As SDKs cobrem as superfícies principa
 
 | Pacote | Runtime | Status | Docs |
 | --- | --- | --- | --- |
-| [`@hyzecloud/sdk`](/pt/sdks/typescript) | Node.js 18+, Bun | **Disponível** | [Guia](/pt/sdks/typescript) |
-| Python | Python 3.10+ | Em breve | — |
+| [`@hyze-cloud/sdk`](/pt/sdks/typescript) | Node.js 18+, Bun | **Disponível** | [Guia](/pt/sdks/typescript) |
+| [`hyze-cloud`](/pt/sdks/python) | Python 3.10+ | **Disponível** | [Guia](/pt/sdks/python) |
 
-## Instalação (Node / Bun)
+## Instalação
+
+### Node / Bun
 
 ```bash
-npm install @hyzecloud/sdk
+npm install @hyze-cloud/sdk
 # ou
-bun add @hyzecloud/sdk
+bun add @hyze-cloud/sdk
 ```
 
 ```ts
-import { HyzeCloud } from "@hyzecloud/sdk";
+import { HyzeCloud } from "@hyze-cloud/sdk";
 
 const hyze = new HyzeCloud({
   apiKey: process.env.HYZE_API_KEY, // hyze_...
 });
 
 const { apps } = await hyze.apps.list();
+```
+
+### Python
+
+```bash
+pip install hyze-cloud
+# ou
+uv add hyze-cloud
+```
+
+```python
+from hyzecloud import HyzeCloud
+
+client = HyzeCloud()  # lê HYZE_API_KEY
+
+apps = client.apps.list()["apps"]
 ```
 
 ## Quando usar uma SDK
@@ -42,16 +60,20 @@ const { apps } = await hyze.apps.list();
 
 Use a [API Reference](/api-reference/introduction) (ou curl) quando quiser controle total ou uma linguagem sem SDK ainda.
 
-## Código e npm
+## Código, npm e PyPI
 
-- npm: [`@hyzecloud/sdk`](https://www.npmjs.com/package/@hyzecloud/sdk)
-- GitHub: [hyze-cloud/hyzecloud-sdk-ts](https://github.com/hyze-cloud/hyzecloud-sdk-ts)
+- npm: [`@hyze-cloud/sdk`](https://www.npmjs.com/package/@hyze-cloud/sdk)
+- PyPI: [`hyze-cloud`](https://pypi.org/project/hyze-cloud/)
+- GitHub: [hyze-cloud](https://github.com/hyze-cloud)
 
 ## Próximos passos
 
 <CardGroup cols={2}>
   <Card title="TypeScript / Node / Bun" icon="code" href="/pt/sdks/typescript">
-    Guia completo do @hyzecloud/sdk.
+    Guia completo do @hyze-cloud/sdk.
+  </Card>
+  <Card title="Python" icon="code" href="/pt/sdks/python">
+    Guia completo do hyze-cloud.
   </Card>
   <Card title="Autenticação" icon="key" href="/pt/guides/api-keys">
     Criar e usar API keys.

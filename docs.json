@@ -137,7 +137,7 @@
             "groups": [
               {
                 "group": "Clients",
-                "pages": ["en/sdks/overview", "en/sdks/typescript"]
+                "pages": ["en/sdks/overview", "en/sdks/typescript", "en/sdks/python"]
               }
             ]
           },
@@ -237,7 +237,7 @@
             "groups": [
               {
                 "group": "Clientes",
-                "pages": ["pt/sdks/overview", "pt/sdks/typescript"]
+                "pages": ["pt/sdks/overview", "pt/sdks/typescript", "pt/sdks/python"]
               }
             ]
           },
